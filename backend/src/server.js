@@ -5,6 +5,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const prisma = require('./prismaClient');
 
+const authRoutes = require('./routes/authRoutes');
+
 dotenv.config();
 
 const app = express();
@@ -41,7 +43,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 // Routes will be registered here in next phase
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // app.use('/api/students', studentRoutes);
 // app.use('/api/companies', companyRoutes);
 // app.use('/api/drives', driveRoutes);
