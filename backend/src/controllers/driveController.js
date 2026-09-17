@@ -94,6 +94,71 @@ const setEligibility = async (req, res) => {
     }
 }
 
+//get eligibility criteria for a particular placement drive
+const getEligibility = async (req, res) => {
+
+    try {
+
+        //get the driveId from the params which will be in string format
+        const {dId} = req.params
+
+        //convert the driveId to int from string
+        const driveId = Number(dId)
+
+        //check if the driveId is parsed successfully or not
+        if(isNaN(driveId) || driveId <= 0){
+            return res.status(400).json({
+                success: false,
+                message: "invalid drive ID"
+            })
+        }
+
+        //check if the placement drive with id = driveId exists in the db or not
+        const placementDrive = await prisma.placementDrive.findUnique({
+            where: {
+                id: driveId
+            }
+        })
+        if(!placementDrive){
+            return res.status(404).json({
+                success: false,
+                message: "drive doesnt exists"
+            })
+        }
+
+        //get the eligibility criteria along with eligible branches
+        const eligibilityCriteria = await prisma.eligibilityCriteria.findUnique({
+            where: {
+                driveId: driveId
+            },
+            include: {
+                eligibleBranches: true
+            }
+        })
+
+        if(!eligibilityCriteria){
+            return res.status(404).json({
+                success: false,
+                message: "eligibility criteria not found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "eligibility criteria retrieved successfully",
+            data: eligibilityCriteria
+        })
+
+    }
+    catch(error){
+        return res.status(500).json({
+            success: false,
+            message: "internal server error"
+        })
+    }
+}
+
 module.exports = {
-    setEligibility
+    setEligibility,
+    getEligibility
 }
