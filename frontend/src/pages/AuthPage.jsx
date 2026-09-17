@@ -28,21 +28,22 @@ export default function AuthPage() {
     e.preventDefault();
     setStatus({ error: '', success: '', loading: true });
 
-    const { name, email, password, confirmPassword, role } = form;
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
 
-    if (!email.trim() || !password) {
+    if (!cleanEmail || !password) {
       return setStatus({ error: 'Please enter all required fields.', success: '', loading: false });
     }
 
     if (!isLogin) {
-      if (!name.trim()) return setStatus({ error: 'Full name is required.', success: '', loading: false });
+      if (!cleanName) return setStatus({ error: 'Full name is required.', success: '', loading: false });
       if (password.length < 6) return setStatus({ error: 'Password must be at least 6 characters.', success: '', loading: false });
       if (password !== confirmPassword) return setStatus({ error: 'Passwords do not match.', success: '', loading: false });
     }
 
     try {
       if (isLogin) {
-        const res = await authService.login({ email: email.trim(), password });
+        const res = await authService.login({ email: cleanEmail, password });
         if (res?.success) {
           setStatus({ error: '', success: 'Signed in successfully! Redirecting...', loading: false });
           setTimeout(() => navigate('/'), 500);
@@ -50,7 +51,7 @@ export default function AuthPage() {
           setStatus({ error: res?.message || 'Invalid credentials.', success: '', loading: false });
         }
       } else {
-        const res = await authService.register({ name: name.trim(), email: email.trim(), password, role });
+        const res = await authService.register({ name: cleanName, email: cleanEmail, password, role });
         if (res?.success) {
           setStatus({ error: '', success: 'Account created! Switching to Sign In...', loading: false });
           setTimeout(() => switchMode(true), 1200);
