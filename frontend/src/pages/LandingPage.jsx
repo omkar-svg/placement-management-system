@@ -1,252 +1,1047 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import HowItWorks from '../components/HowItWorks/HowItWorks'
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-// ─── Icon Components ──────────────────────────────────────
+const navigationLinks = [
+  { label: "Home", path: "/" },
+  { label: "Features", path: "/features" },
+  { label: "How It Works", path: "/how-it-works" },
+  { label: "Roles", path: "/roles" },
+  { label: "About Us", path: "/about" },
+  { label: "Contact", path: "/contact" },
+];
 
-const GraduationCapIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-  </svg>
-)
+const features = [
+  {
+    title: "Student Management",
+    description:
+      "Create profiles, add skills, upload resumes and track placement progress.",
+    type: "student",
+  },
+  {
+    title: "Company Management",
+    description:
+      "Manage companies, job roles, CTC, locations and hiring processes.",
+    type: "company",
+  },
+  {
+    title: "Placement Drives",
+    description:
+      "Create drives, set schedules, venues, deadlines and job types.",
+    type: "drive",
+  },
+  {
+    title: "Smart Eligibility",
+    description:
+      "Automatic eligibility based on CGPA, backlogs, branch and graduation year.",
+    type: "eligibility",
+  },
+  {
+    title: "Analytics & Reports",
+    description:
+      "Get insights, branch-wise reports and analytics with useful reports.",
+    type: "analytics",
+  },
+  {
+    title: "Notifications",
+    description:
+      "Get real-time updates on drives, shortlists and important announcements.",
+    type: "notification",
+  },
+];
 
-const BuildingIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
-    <path d="M9 22v-4h6v4" />
-    <path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
-  </svg>
-)
+const placementSteps = [
+  {
+    number: "01",
+    title: "Create Profile",
+    description: "Add academic and personal details.",
+    type: "profile",
+  },
+  {
+    number: "02",
+    title: "Discover Opportunities",
+    description: "Browse drives and companies looking for talent.",
+    type: "opportunities",
+  },
+  {
+    number: "03",
+    title: "Check Eligibility",
+    description: "System checks eligibility based on configured rules.",
+    type: "eligibility",
+  },
+  {
+    number: "04",
+    title: "Appear & Track",
+    description: "Attend drives and track your placement status.",
+    type: "track",
+  },
+  {
+    number: "05",
+    title: "Get Placed",
+    description: "Move ahead in the process and achieve your career goals.",
+    type: "placed",
+  },
+];
 
-const RocketIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-  </svg>
-)
+const roles = [
+  {
+    title: "Student",
+    description:
+      "Build your profile, find opportunities and track your placement journey.",
+    type: "student",
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=85",
+    points: [
+      "Profile & Resume",
+      "Find Drives",
+      "Check Eligibility",
+      "Track Placement Status",
+    ],
+  },
+  {
+    title: "TPO",
+    description:
+      "Manage placements efficiently and connect the right talent with companies.",
+    type: "tpo",
+    image:
+      "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=700&q=85",
+    points: [
+      "Manage Students",
+      "Manage Companies",
+      "Create Drives",
+      "Analytics & Reports",
+    ],
+  },
+  {
+    title: "Admin",
+    description:
+      "Oversee the entire placement ecosystem and maintain platform integrity.",
+    type: "admin",
+    image:
+      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=700&q=85",
+    points: [
+      "User Management",
+      "System Settings",
+      "Reports & Analytics",
+      "Audit & Logs",
+    ],
+  },
+];
 
-const ShieldIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-    <path d="m9 12 2 2 4-4" />
-  </svg>
-)
+const statistics = [
+  ["500+", "Students"],
+  ["180+", "Placed Students"],
+  ["36%", "Placement Rate"],
+  ["42+", "Recruiting Companies"],
+  ["25+", "Placement Drives"],
+  ["100%", "Secure Platform"],
+];
 
-const ChartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 3v18h18" />
-    <path d="m19 9-5 5-4-4-3 3" />
-  </svg>
-)
+/* ---------------- ICONS ---------------- */
 
-const BellIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-  </svg>
-)
+/** Renders the arrow icon. */
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M5 12h13" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
+  );
+}
 
-const UsersIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-)
+/** Renders the menu icon. */
+function MenuIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+    </svg>
+  );
+}
 
-const FileTextIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-    <path d="M10 9H8" />
-    <path d="M16 13H8" />
-    <path d="M16 17H8" />
-  </svg>
-)
+/** Renders the close icon. */
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="m6 6 12 12" />
+      <path d="m18 6-12 12" />
+    </svg>
+  );
+}
 
-const ArrowRightIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14" />
-    <path d="m12 5 7 7-7 7" />
-  </svg>
-)
+/** Renders the sun icon. */
+function SunIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
+    </svg>
+  );
+}
 
-const CheckIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-)
+/** Renders the moon icon. */
+function MoonIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" />
+    </svg>
+  );
+}
 
-const MenuIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="4" x2="20" y1="12" y2="12" />
-    <line x1="4" x2="20" y1="6" y2="6" />
-    <line x1="4" x2="20" y1="18" y2="18" />
-  </svg>
-)
+/** Renders a feature icon. */
+function FeatureIcon({ type }) {
+  const props = {
+    viewBox: "0 0 24 24",
+    className: "h-6 w-6",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+  };
 
-const CloseIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 6 6 18" />
-    <path d="m6 6 12 12" />
-  </svg>
-)
+  if (type === "student") {
+    return (
+      <svg {...props}>
+        <circle cx="12" cy="8" r="3" />
+        <path d="M6 20c.5-3.3 2.5-5 6-5s5.5 1.7 6 5" />
+      </svg>
+    );
+  }
 
-// ─── Navbar Component ─────────────────────────────────────
+  if (type === "company") {
+    return (
+      <svg {...props}>
+        <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
+        <path d="M15 10h4a1 1 0 0 1 1 1v10" />
+        <path d="M8 8h3M8 12h3M8 16h3M17 14h1M17 17h1" />
+        <path d="M2 21h20" />
+      </svg>
+    );
+  }
 
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
+  if (type === "drive") {
+    return (
+      <svg {...props}>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M16 3v4M8 3v4M3 10h18" />
+        <path d="M8 14h3M13 14h3M8 17h3" />
+      </svg>
+    );
+  }
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  if (type === "eligibility") {
+    return (
+      <svg {...props}>
+        <path d="M12 3 20 6v5c0 5-3.2 8.3-8 10-4.8-1.7-8-5-8-10V6l8-3Z" />
+        <path d="m8.5 12 2.3 2.3 4.7-5" />
+      </svg>
+    );
+  }
+
+  if (type === "analytics") {
+    return (
+      <svg {...props}>
+        <path d="M4 19V5M4 19h17" />
+        <path d="m7 15 4-4 3 2 6-7" />
+      </svg>
+    );
+  }
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-200/50 py-3'
-          : 'bg-transparent py-6'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-3.5 group">
-          <div className="relative">
-            <div className="absolute inset-0 bg-blue-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />
-            <img 
-              src="/DKTE-LOGO.png" 
-              alt="DKTE Logo" 
-              className="h-10 w-auto relative z-10 transition-transform duration-500 group-hover:scale-105" 
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-black tracking-tight text-slate-900 leading-none mb-1">
-              DKTE <span className="text-blue-600">Placement</span>
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-              Official Portal
-            </span>
+    <svg {...props}>
+      <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
+      <path d="M10 21h4" />
+    </svg>
+  );
+}
+
+/** Renders an icon for a placement step. */
+function StepIcon({ type }) {
+  const props = {
+    viewBox: "0 0 24 24",
+    className: "h-6 w-6",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+  };
+
+  if (type === "profile") {
+    return (
+      <svg {...props}>
+        <circle cx="12" cy="8" r="3" />
+        <path d="M6 20c.5-3.5 2.5-5 6-5s5.5 1.5 6 5" />
+      </svg>
+    );
+  }
+
+  if (type === "opportunities") {
+    return (
+      <svg {...props}>
+        <rect x="4" y="7" width="16" height="13" rx="2" />
+        <path d="M9 7V5h6v2M8 12h8" />
+      </svg>
+    );
+  }
+
+  if (type === "eligibility") {
+    return (
+      <svg {...props}>
+        <path d="M12 3 20 6v5c0 5-3.2 8.3-8 10-4.8-1.7-8-5-8-10V6l8-3Z" />
+        <path d="m8.5 12 2.3 2.3 4.7-5" />
+      </svg>
+    );
+  }
+
+  if (type === "track") {
+    return (
+      <svg {...props}>
+        <rect x="5" y="4" width="14" height="17" rx="2" />
+        <path d="M9 8h6M9 12h6M9 16h3" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...props}>
+      <path d="m12 3 2.3 5 5.5.7-4 3.8 1 5.5-4.8-2.6-4.8 2.6 1-5.5-4-3.8L9.7 8 12 3Z" />
+    </svg>
+  );
+}
+
+/* ---------------- NAVBAR ---------------- */
+
+/** Renders the responsive navigation bar with theme switching. */
+function Navbar({ darkMode, setDarkMode }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#07152d] shadow-lg">
+      <div className="mx-auto flex h-[78px] max-w-[1320px] items-center justify-between px-4 sm:px-7 lg:px-10">
+        <Link to="/" className="flex shrink-0 items-center gap-3">
+          <img
+            src="/DKTE-LOGO.png"
+            alt="DKTE Logo"
+            className="h-10 w-auto sm:h-11"
+          />
+
+          <div className="hidden border-l border-white/25 pl-3 leading-tight md:block">
+            <p className="text-xs font-bold text-white">
+              DKTE Society&apos;s
+            </p>
+            <p className="text-[10px] font-semibold text-white">
+              Textile & Engineering Institute
+            </p>
+            <p className="text-[9px] text-slate-300">
+              Ichalkaranji
+            </p>
           </div>
         </Link>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Link
-            to="/login"
-            className="hidden sm:block px-5 py-3 text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors duration-200"
+        <nav className="hidden items-center gap-1 lg:flex">
+          {navigationLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.path}
+              className="rounded-lg px-3 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10 hover:text-[#ffc52c] xl:px-4"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          {/* Theme switch */}
+          <button
+            type="button"
+            aria-label={
+              darkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
+            onClick={() => setDarkMode((current) => !current)}
+            className="flex h-10 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-white transition hover:border-[#ffc52c] hover:text-[#ffc52c]"
           >
-            Sign In
-          </Link>
+            {darkMode ? <MoonIcon /> : <SunIcon />}
+
+            <span className="text-[11px] font-semibold">
+              {darkMode ? "Dark" : "Light"}
+            </span>
+
+            <span className="relative h-5 w-9 rounded-full bg-white/20">
+              <span
+                className={`absolute top-0.5 h-4 w-4 rounded-full bg-[#ffc52c] transition-all ${
+                  darkMode ? "left-[17px]" : "left-0.5"
+                }`}
+              />
+            </span>
+          </button>
+
           <Link
-            to="/login"
-            className="px-8 py-3 text-sm font-bold bg-slate-900 text-white rounded-xl hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5"
+            to="/get-started"
+            className="inline-flex items-center gap-2 rounded-full bg-[#ffc52c] px-5 py-3 text-xs font-bold text-[#07152d] shadow-md transition hover:bg-[#ffd45c] hover:shadow-lg"
           >
             Get Started
+            <ArrowIcon />
           </Link>
         </div>
+
+        <button
+          type="button"
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMobileMenuOpen((current) => !current)}
+          className="rounded-lg border border-white/25 p-2 text-white hover:bg-white/10 lg:hidden"
+        >
+          {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+        </button>
       </div>
-    </nav>
-  )
+
+      {mobileMenuOpen && (
+        <div className="border-t border-white/10 bg-[#07152d] px-5 py-5 lg:hidden">
+          <nav className="flex flex-col gap-1">
+            {navigationLinks.map((link) => (
+              <Link
+                key={link.label}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-lg px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 hover:text-[#ffc52c]"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="mt-4 flex gap-3">
+            <button
+              type="button"
+              onClick={() => setDarkMode((current) => !current)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-xs font-semibold text-white"
+            >
+              {darkMode ? <MoonIcon /> : <SunIcon />}
+              {darkMode ? "Dark Mode" : "Light Mode"}
+            </button>
+
+            <Link
+              to="/get-started"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#ffc52c] px-4 py-3 text-xs font-bold text-[#07152d]"
+            >
+              Get Started
+              <ArrowIcon />
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
+  );
 }
 
-// ─── Hero Section ─────────────────────────────────────────
+/* ---------------- HERO ---------------- */
 
+/** Renders the hero section. */
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Background Elements */}
+    <section className="relative isolate overflow-hidden bg-[#07152d] pt-[78px]">
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/15 rounded-full blur-3xl animate-float delay-300" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-3xl" />
+        <img
+          src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=2000&q=90"
+          alt=""
+          className="h-full w-full object-cover"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07152d] via-[#07152d]/90 to-[#07152d]/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07152d] via-transparent to-[#07152d]/20" />
       </div>
 
-      {/* Grid Pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
+      <div className="relative mx-auto flex min-h-[620px] max-w-[1320px] items-center px-5 py-16 sm:px-8 lg:px-10">
+        <div className="max-w-[650px]">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ffc52c]/30 bg-[#ffc52c]/10 px-4 py-2 text-[10px] font-bold tracking-[0.12em] text-[#ffc52c] uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#ffc52c]" />
+            DKTE Placement Management System
+          </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 text-center">
-        {/* Badge */}
-        <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 text-sm text-primary-600 mb-8 font-medium">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          Version 1.0 — Now Live
-        </div>
-
-        {/* Heading */}
-        <h1 className="animate-fade-in-up delay-100 text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.05] mb-6 text-slate-900" style={{ opacity: 0 }}>
-          Your Campus
-          <br />
-          <span className="gradient-text">Placement Hub</span>
-        </h1>
-
-        {/* Subheading */}
-        <p className="animate-fade-in-up delay-200 text-lg md:text-xl text-slate-500 max-w-2xl mx-auto mb-16 leading-relaxed font-medium" style={{ opacity: 0 }}>
-          Simplify and digitize your entire placement process. From student profiles to company drives — manage everything in one powerful platform.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="animate-fade-in-up delay-300 flex flex-col sm:flex-row items-center justify-center gap-6" style={{ opacity: 0 }}>
-          <Link
-            to="/login"
-            className="group px-10 py-5 text-lg font-bold bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all duration-300 shadow-xl shadow-slate-900/20 flex items-center gap-3 hover:-translate-y-1"
-          >
-            Get Started Free
-            <span className="transition-transform duration-300 group-hover:translate-x-1">
-              <ArrowRightIcon />
+          <h1 className="text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[62px]">
+            Connecting Talent.
+            <span className="block text-[#ffc52c]">
+              Creating Futures.
             </span>
-          </Link>
-          <a
-            href="#features"
-            className="px-10 py-5 text-lg font-bold text-slate-700 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md"
+          </h1>
+
+          <p className="mt-6 max-w-[580px] text-base leading-7 text-slate-200 sm:text-lg">
+            A unified platform to manage students, companies, placement
+            drives, eligibility and placement progress with ease and
+            efficiency.
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link
+              to="/get-started"
+              className="inline-flex items-center justify-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition hover:-translate-y-1 hover:bg-[#ffd45c]"
+            >
+              Get Started Now
+              <ArrowIcon />
+            </Link>
+
+            <Link
+              to="/features"
+              className="inline-flex items-center justify-center gap-3 rounded-full border border-white/50 bg-white/5 px-7 py-4 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+            >
+              Explore Features
+              <ArrowIcon />
+            </Link>
+          </div>
+
+          <div className="mt-10 grid grid-cols-2 gap-y-5 border-t border-white/15 pt-7 sm:grid-cols-4 sm:gap-0">
+            {[
+              ["500+", "Students"],
+              ["180+", "Placed"],
+              ["42+", "Companies"],
+              ["36%", "Placement Rate"],
+            ].map(([value, label]) => (
+              <div
+                key={label}
+                className="border-white/10 sm:border-r sm:px-5 first:sm:pl-0 last:sm:border-r-0"
+              >
+                <p className="text-xl font-bold text-[#ffc52c]">{value}</p>
+                <p className="mt-1 text-xs text-slate-300">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="relative mx-auto -mt-2 max-w-[1080px] px-5 pb-7 sm:px-8">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#111f3a] px-5 py-4 shadow-2xl sm:flex-row sm:px-7">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ffc52c] text-sm text-[#07152d]">
+              !
+            </span>
+
+            <div>
+              <p className="text-[10px] font-semibold tracking-wider text-[#ffc52c] uppercase">
+                Upcoming Placement Drive
+              </p>
+              <p className="mt-1 text-xs text-white sm:text-sm">
+                TCS Digital Campus Drive on 25 May 2024
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to="/placement-drives"
+            className="flex items-center gap-2 text-xs font-bold text-[#ffc52c] hover:text-white"
           >
-            Explore Platform
-          </a>
+            View All Drives
+            <ArrowIcon />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- FEATURES ---------------- */
+
+/** Renders a single feature card. */
+function FeatureCard({ feature }) {
+  const isAnalytics = feature.type === "analytics";
+
+  return (
+    <article className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded-xl ${
+          isAnalytics
+            ? "bg-purple-100 text-purple-700"
+            : "bg-[#edf3fb] text-[#0b2854]"
+        }`}
+      >
+        <FeatureIcon type={feature.type} />
+      </div>
+
+      <h3 className="mt-5 text-lg font-bold text-[#0b1f3a]">
+        {feature.title}
+      </h3>
+
+      <p className="mt-3 text-sm leading-6 text-slate-500">
+        {feature.description}
+      </p>
+
+      <Link
+        to="/features"
+        className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#0b2854] group-hover:text-[#a17b00]"
+      >
+        Explore
+        <ArrowIcon />
+      </Link>
+    </article>
+  );
+}
+
+/** Renders the features section. */
+function FeaturesSection() {
+  return (
+    <section className="bg-[#f7f9fc] py-20">
+      <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+            Powerful Modules
+          </p>
+
+          <h2 className="mt-3 text-3xl font-bold text-[#0b1f3a] sm:text-4xl">
+            Everything You Need in One Platform
+          </h2>
+
+          <p className="mt-4 text-sm leading-6 text-slate-500">
+            A centralized system designed to simplify every stage of campus
+            placements.
+          </p>
         </div>
 
-        {/* Stats Row */}
-        <div className="animate-fade-in-up delay-500 mt-28 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto" style={{ opacity: 0 }}>
-          {[
-            { value: '2500+', label: 'Students' },
-            { value: '140+', label: 'Companies' },
-            { value: '95%', label: 'Placement Rate' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl md:text-3xl font-bold gradient-text">{stat.value}</div>
-              <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => (
+            <FeatureCard key={feature.title} feature={feature} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- HOW IT WORKS ---------------- */
+
+/** Renders one placement journey step. */
+function PlacementStep({ step }) {
+  return (
+    <div className="relative flex flex-1 flex-col items-center text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-[#17274b] text-[#ffc52c]">
+        <StepIcon type={step.type} />
+      </div>
+
+      <span className="mt-3 text-[9px] font-bold text-[#ffc52c]">
+        {step.number}
+      </span>
+
+      <h3 className="mt-2 text-sm font-bold text-white">{step.title}</h3>
+
+      <p className="mt-2 max-w-[160px] text-xs leading-5 text-slate-300">
+        {step.description}
+      </p>
+    </div>
+  );
+}
+
+/** Renders the how-it-works section. */
+function HowItWorksSection() {
+  return (
+    <section className="bg-[#0b1f3a] py-20">
+      <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+        <div className="rounded-3xl bg-gradient-to-br from-[#07152d] to-[#211653] px-6 py-12 shadow-2xl sm:px-10 lg:px-12">
+          <div className="grid gap-12 lg:grid-cols-[270px_1fr] lg:items-center">
+            <div>
+              <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
+                How It Works
+              </p>
+
+              <h2 className="mt-3 text-3xl font-bold text-white">
+                From Profile to Placement
+              </h2>
+
+              <p className="mt-4 text-sm leading-6 text-slate-300">
+                A simple five-step journey from creating your profile to
+                achieving your placement goal.
+              </p>
+
+              <Link
+                to="/how-it-works"
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#ffc52c] px-6 py-3 text-xs font-bold text-[#07152d]"
+              >
+                Learn More
+                <ArrowIcon />
+              </Link>
+            </div>
+
+            <div className="grid gap-10 sm:grid-cols-2 lg:flex lg:gap-0">
+              {placementSteps.map((step) => (
+                <PlacementStep key={step.number} step={step} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- ROLES ---------------- */
+
+/** Returns the styling theme for a role. */
+function getRoleTheme(type) {
+  if (type === "student") {
+    return {
+      card: "bg-[#fff8e5]",
+      title: "text-[#10284b]",
+      text: "text-slate-600",
+      button: "bg-[#ffc52c] text-[#07152d]",
+    };
+  }
+
+  return {
+    card: "bg-[#0b2854]",
+    title: "text-white",
+    text: "text-slate-300",
+    button: "bg-white/10 text-white",
+  };
+}
+
+/** Renders a role card. */
+function RoleCard({ role }) {
+  const theme = getRoleTheme(role.type);
+
+  return (
+    <article
+      className={`overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
+    >
+      <div className="grid min-h-[300px] grid-cols-[40%_60%]">
+        <div className="overflow-hidden">
+          <img
+            src={role.image}
+            alt={`${role.title} role`}
+            className="h-full w-full object-cover"
+          />
+        </div>
+
+        <div className="flex flex-col p-5">
+          <span className="text-[10px] font-bold tracking-widest uppercase opacity-70">
+            Placement Role
+          </span>
+
+          <h3 className={`mt-2 text-xl font-bold ${theme.title}`}>
+            {role.title}
+          </h3>
+
+          <p className={`mt-2 text-xs leading-5 ${theme.text}`}>
+            {role.description}
+          </p>
+
+          <ul className="mt-4 space-y-2">
+            {role.points.map((point) => (
+              <li
+                key={point}
+                className={`flex items-center gap-2 text-[10px] font-medium ${theme.text}`}
+              >
+                <span className="text-[#ffc52c]">✓</span>
+                {point}
+              </li>
+            ))}
+          </ul>
+
+          <Link
+            to="/roles"
+            className={`mt-auto flex h-8 w-8 items-center justify-center self-end rounded-full ${theme.button}`}
+          >
+            <ArrowIcon />
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/** Renders the roles section. */
+function RolesSection() {
+  return (
+    <section className="bg-white py-20">
+      <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+        <div>
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+            One Platform. Three Roles.
+          </p>
+
+          <h2 className="mt-3 text-3xl font-bold text-[#0b1f3a] sm:text-4xl">
+            Built for Students, TPOs and Admins
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+          {roles.map((role) => (
+            <RoleCard key={role.title} role={role} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- STATISTICS ---------------- */
+
+/** Renders the statistics section. */
+function StatisticsSection() {
+  return (
+    <section className="bg-[#07152d] py-10">
+      <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+          {statistics.map(([value, label]) => (
+            <div key={label} className="px-4 py-4 text-center">
+              <p className="text-2xl font-bold text-[#ffc52c] sm:text-3xl">
+                {value}
+              </p>
+
+              <p className="mt-1 text-[10px] text-slate-300 sm:text-xs">
+                {label}
+              </p>
             </div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
+/* ---------------- ABOUT ---------------- */
 
-
-// ─── Landing Page ─────────────────────────────────────────
-export default function LandingPage() {
+/** Renders the about section. */
+function AboutSection() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <HeroSection />
+    <section className="bg-[#f7f9fc] py-20">
+      <div className="mx-auto grid max-w-[1240px] gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-10">
+        <div>
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+            About Us
+          </p>
 
-      <div className="w-full flex justify-center px-6">
-        <div className="w-full max-w-6xl">
-          <HowItWorks />
+          <h2 className="mt-3 text-3xl font-bold text-[#0b1f3a] sm:text-4xl">
+            Simplifying the Placement Journey
+          </h2>
+
+          <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
+            The DKTE Placement Management System brings students, placement
+            activities, companies and administrators together on one
+            organized platform.
+          </p>
+
+          <Link
+            to="/about"
+            className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#0b1f3a] px-6 py-3 text-xs font-bold text-white transition hover:bg-[#12345f]"
+          >
+            Learn About Us
+            <ArrowIcon />
+          </Link>
+        </div>
+
+        <div className="rounded-3xl bg-white p-4 shadow-xl">
+          <div className="rounded-2xl bg-[#0b1f3a] p-6">
+            <p className="text-[9px] tracking-widest text-slate-400 uppercase">
+              Placement Dashboard
+            </p>
+
+            <h3 className="mt-2 text-lg font-bold text-white">
+              Placement Overview
+            </h3>
+
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              {[
+                ["500+", "Students"],
+                ["180+", "Placed"],
+                ["42+", "Companies"],
+              ].map(([value, label]) => (
+                <div
+                  key={label}
+                  className="rounded-xl bg-white/10 p-3 text-center"
+                >
+                  <p className="text-lg font-bold text-[#ffc52c]">{value}</p>
+                  <p className="mt-1 text-[8px] text-slate-300">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 flex h-28 items-end gap-2 rounded-xl bg-white/5 p-4">
+              {[35, 48, 42, 65, 58, 78, 70, 90].map((height, index) => (
+                <div
+                  key={index}
+                  className="flex-1 rounded-t bg-[#ffc52c]"
+                  style={{ height: `${height}px` }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    </section>
+  );
 }
+
+/* ---------------- CTA ---------------- */
+
+/** Renders the final call-to-action section. */
+function FinalCTA() {
+  return (
+    <section className="bg-[#211653]">
+      <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-8 px-5 py-12 sm:px-8 md:flex-row md:items-center lg:px-10">
+        <div>
+          <p className="text-[10px] font-bold tracking-[0.2em] text-[#ffc52c] uppercase">
+            Your Next Chapter Starts Here
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
+            Ready to Simplify Placements?
+          </h2>
+
+          <p className="mt-2 text-sm text-slate-300">
+            Take the first step towards a smarter placement process.
+          </p>
+        </div>
+
+        <Link
+          to="/get-started"
+          className="inline-flex items-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition hover:bg-[#ffd45c]"
+        >
+          Get Started Now
+          <ArrowIcon />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- FOOTER ---------------- */
+
+/** Renders the site footer. */
+function Footer() {
+  return (
+    <footer className="bg-[#07152d] text-white">
+      <div className="mx-auto max-w-[1240px] px-5 py-12 sm:px-8 lg:px-10">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <img
+              src="/DKTE-LOGO.png"
+              alt="DKTE Logo"
+              className="h-10 w-auto"
+            />
+
+            <p className="mt-4 text-xs font-bold">DKTE Society&apos;s</p>
+
+            <p className="mt-1 text-xs text-slate-300">
+              Textile & Engineering Institute, Ichalkaranji
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold">Quick Links</h3>
+
+            <ul className="mt-4 space-y-2">
+              {navigationLinks.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    to={link.path}
+                    className="text-xs text-slate-400 hover:text-[#ffc52c]"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold">Features</h3>
+
+            <ul className="mt-4 space-y-2">
+              {features.map((feature) => (
+                <li key={feature.title}>
+                  <Link
+                    to="/features"
+                    className="text-xs text-slate-400 hover:text-[#ffc52c]"
+                  >
+                    {feature.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold">Support</h3>
+
+            <ul className="mt-4 space-y-2">
+              {[
+                "Help Center",
+                "Documentation",
+                "Privacy Policy",
+                "Terms & Conditions",
+                "Contact Support",
+              ].map((item) => (
+                <li key={item}>
+                  <Link
+                    to="/contact"
+                    className="text-xs text-slate-400 hover:text-[#ffc52c]"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-10 border-t border-white/10 pt-6 text-center">
+          <p className="text-[10px] text-slate-500">
+            © 2024 DKTE Society&apos;s Textile & Engineering Institute. All
+            rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ---------------- MAIN PAGE ---------------- */
+
+/** Renders the complete landing page and controls its theme. */
+function LandingPage() {
+  const [darkMode, setDarkMode] = useState(false);
+
+  return (
+    <div className={darkMode ? "dark" : ""}>
+      <div className="min-h-screen bg-white text-[#0b1f3a] transition-colors duration-300 dark:bg-[#07152d] dark:text-white">
+        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <RolesSection />
+        <StatisticsSection />
+        <AboutSection />
+        <FinalCTA />
+        <Footer />
+      </div>
+    </div>
+  );
+}
+
+export default LandingPage;
