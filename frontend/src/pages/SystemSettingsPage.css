@@ -1,0 +1,52 @@
+.system-settings-page__loading {
+  padding: 48px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.system-settings-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.system-settings-page__header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.system-settings-page__header p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.system-settings-page__save-btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-gold-500);
+  color: var(--color-navy-950);
+  white-space: nowrap;
+}
+
+.system-settings-page__save-btn:hover {
+  background: var(--color-gold-400);
+}
+
+.system-settings-page__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .system-settings-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

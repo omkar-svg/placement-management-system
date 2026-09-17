@@ -1,0 +1,92 @@
+import React, { useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { FaChevronDown } from 'react-icons/fa';
+import './ActivityChart.css';
+
+// `legend`, `data`, and `periodOptions` all come from adminDashboardService
+// via the page — this component only knows how to render them.
+function ActivityChart({ legend, data, periodOptions }) {
+  const [period, setPeriod] = useState(periodOptions[0]);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleSelectPeriod = (option) => {
+    setPeriod(option);
+    setMenuOpen(false);
+  };
+
+  return (
+    <section className="activity-chart">
+      <div className="activity-chart__header">
+        <h2>System Activity Monitor</h2>
+
+        <div className="activity-chart__period">
+          <button
+            type="button"
+            className="activity-chart__period-btn"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-haspopup="listbox"
+            aria-expanded={menuOpen}
+          >
+            {period} <FaChevronDown />
+          </button>
+          {menuOpen && (
+            <ul className="activity-chart__period-menu" role="listbox">
+              {periodOptions.map((option) => (
+                <li key={option}>
+                  <button
+                    type="button"
+                    className="activity-chart__period-option"
+                    onClick={() => handleSelectPeriod(option)}
+                    role="option"
+                    aria-selected={option === period}
+                  >
+                    {option}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <div className="activity-chart__legend">
+        {legend.map((series) => (
+          <div className="activity-chart__legend-item" key={series.key}>
+            <span className="activity-chart__legend-dot" style={{ background: series.color }} />
+            {series.name}
+          </div>
+        ))}
+      </div>
+
+      <div className="activity-chart__canvas">
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={data} barGap={4} barCategoryGap={28}>
+            <CartesianGrid vertical={false} stroke="#eef0f6" />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9aa1b3', fontSize: 13 }} />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#9aa1b3', fontSize: 12 }}
+              domain={[0, 1200]}
+              ticks={[0, 200, 400, 600, 800, 1000, 1200]}
+            />
+            <Tooltip cursor={{ fill: 'rgba(16,25,58,0.04)' }} />
+            <Bar dataKey="saturated" fill="var(--color-chart-dark)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="medium" fill="var(--color-chart-mid)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="light" fill="var(--color-chart-light)" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </section>
+  );
+}
+
+export default ActivityChart;
