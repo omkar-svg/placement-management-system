@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import HowItWorks from '../components/HowItWorks/HowItWorks'
 
 // ─── Icon Components ──────────────────────────────────────
 
@@ -235,12 +236,17 @@ function HeroSection() {
 
 
 // ─── Landing Page ─────────────────────────────────────────
-
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <HeroSection />
+
+      <div className="w-full flex justify-center px-6">
+        <div className="w-full max-w-6xl">
+          <HowItWorks />
+        </div>
+      </div>
     </div>
   )
 }
