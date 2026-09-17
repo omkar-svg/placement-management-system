@@ -1,5 +1,69 @@
-// Drive Controller - To be implemented
+// Drive Controller
+
 const prisma = require("../prisma");
+
+// Validate Placement Drive fields
+const validateDriveFields = async ({
+    companyId,
+    packageAmount,
+    driveDate,
+    deadline,
+    jobType,
+    role,
+    venue
+}) => {
+
+    // Package must not be empty
+    if (packageAmount !== undefined && !String(packageAmount).trim()) {
+        return "Package cannot be empty";
+    }
+
+    // Role must not be empty
+    if (role !== undefined && !String(role).trim()) {
+        return "Role cannot be empty";
+    }
+
+    // Venue must not be empty
+    if (venue !== undefined && !String(venue).trim()) {
+        return "Venue cannot be empty";
+    }
+
+    // Job type must not be empty
+    if (jobType !== undefined && !String(jobType).trim()) {
+        return "Job type cannot be empty";
+    }
+
+    // Deadline must be before drive date
+    if (driveDate && deadline) {
+        const driveTime = new Date(driveDate).getTime();
+        const deadlineTime = new Date(deadline).getTime();
+
+        if (deadlineTime >= driveTime) {
+            return "Deadline must be before the drive date";
+        }
+    }
+
+    // Deadline should not be in the past
+    if (deadline && new Date(deadline).getTime() < Date.now()) {
+        return "Deadline cannot be in the past";
+    }
+
+    // Company must exist
+    if (companyId !== undefined) {
+        const company = await prisma.company.findUnique({
+            where: {
+                id: Number(companyId)
+            }
+        });
+
+        if (!company) {
+            return "Invalid companyId: company does not exist";
+        }
+    }
+
+    return null;
+};
+
 
 // Create Placement Drive
 const createDrive = async (req, res) => {
@@ -16,25 +80,66 @@ const createDrive = async (req, res) => {
             hiringProcess
         } = req.body;
 
-        if (!companyId || !role || !packageAmount || !driveDate || !deadline || !jobType) {
+        // Required fields
+        if (
+            companyId === undefined ||
+            companyId === null ||
+            !role ||
+            !packageAmount ||
+            !driveDate ||
+            !venue ||
+            !deadline ||
+            !jobType ||
+            !description ||
+            !hiringProcess
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Required fields are missing"
             });
         }
 
+        // Validate dates
+        if (
+            isNaN(new Date(driveDate).getTime()) ||
+            isNaN(new Date(deadline).getTime())
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid drive date or deadline"
+            });
+        }
+
+        // Validate additional fields
+        const validationError = await validateDriveFields({
+            companyId,
+            packageAmount,
+            driveDate,
+            deadline,
+            jobType,
+            role,
+            venue
+        });
+
+        if (validationError) {
+            return res.status(400).json({
+                success: false,
+                message: validationError
+            });
+        }
+
         const drive = await prisma.placementDrive.create({
             data: {
-                companyId,
+                companyId: Number(companyId),
                 createdBy: req.user.id,
-                role,
-                package: packageAmount,
+                role: String(role).trim(),
+                package: String(packageAmount).trim(),
                 driveDate: new Date(driveDate),
-                venue,
+                venue: String(venue).trim(),
                 deadline: new Date(deadline),
-                jobType,
-                description,
-                hiringProcess
+                jobType: String(jobType).trim(),
+                description: String(description).trim(),
+                hiringProcess: String(hiringProcess).trim()
             }
         });
 
@@ -53,6 +158,8 @@ const createDrive = async (req, res) => {
         });
     }
 };
+
+
 // Get all Placement Drives
 const getAllDrives = async (req, res) => {
     try {
@@ -80,14 +187,24 @@ const getAllDrives = async (req, res) => {
         });
     }
 };
+
+
 // Get Placement Drive by ID
 const getDriveById = async (req, res) => {
     try {
         const { id } = req.params;
+        const driveId = parseInt(id);
+
+        if (isNaN(driveId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid drive ID"
+            });
+        }
 
         const drive = await prisma.placementDrive.findUnique({
             where: {
-                id: parseInt(id)
+                id: driveId
             },
             include: {
                 company: true
@@ -116,10 +233,20 @@ const getDriveById = async (req, res) => {
         });
     }
 };
+
+
 // Update Placement Drive
 const updateDrive = async (req, res) => {
     try {
         const { id } = req.params;
+        const driveId = parseInt(id);
+
+        if (isNaN(driveId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid drive ID"
+            });
+        }
 
         const {
             companyId,
@@ -135,7 +262,7 @@ const updateDrive = async (req, res) => {
 
         const existingDrive = await prisma.placementDrive.findUnique({
             where: {
-                id: parseInt(id)
+                id: driveId
             }
         });
 
@@ -148,19 +275,106 @@ const updateDrive = async (req, res) => {
 
         const updateData = {};
 
-        if (companyId !== undefined) updateData.companyId = companyId;
-        if (role !== undefined) updateData.role = role;
-        if (packageAmount !== undefined) updateData.package = packageAmount;
-        if (driveDate !== undefined) updateData.driveDate = new Date(driveDate);
-        if (venue !== undefined) updateData.venue = venue;
-        if (deadline !== undefined) updateData.deadline = new Date(deadline);
-        if (jobType !== undefined) updateData.jobType = jobType;
-        if (description !== undefined) updateData.description = description;
-        if (hiringProcess !== undefined) updateData.hiringProcess = hiringProcess;
+        if (companyId !== undefined) {
+            updateData.companyId = Number(companyId);
+        }
+
+        if (role !== undefined) {
+            updateData.role = String(role).trim();
+        }
+
+        if (packageAmount !== undefined) {
+            updateData.package = String(packageAmount).trim();
+        }
+
+        if (driveDate !== undefined) {
+            if (isNaN(new Date(driveDate).getTime())) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid drive date"
+                });
+            }
+
+            updateData.driveDate = new Date(driveDate);
+        }
+
+        if (venue !== undefined) {
+            updateData.venue = String(venue).trim();
+        }
+
+        if (deadline !== undefined) {
+            if (isNaN(new Date(deadline).getTime())) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid deadline"
+                });
+            }
+
+            updateData.deadline = new Date(deadline);
+        }
+
+        if (jobType !== undefined) {
+            updateData.jobType = String(jobType).trim();
+        }
+
+        if (description !== undefined) {
+            updateData.description = String(description).trim();
+        }
+
+        if (hiringProcess !== undefined) {
+            updateData.hiringProcess = String(hiringProcess).trim();
+        }
+
+        // At least one field required
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "At least one field is required for update"
+            });
+        }
+
+        // Use updated values or existing values for validation
+        const effectiveDriveDate =
+            updateData.driveDate ?? existingDrive.driveDate;
+
+        const effectiveDeadline =
+            updateData.deadline ?? existingDrive.deadline;
+
+        const effectiveCompanyId =
+            updateData.companyId ?? existingDrive.companyId;
+
+        const effectiveRole =
+            updateData.role ?? existingDrive.role;
+
+        const effectivePackage =
+            updateData.package ?? existingDrive.package;
+
+        const effectiveVenue =
+            updateData.venue ?? existingDrive.venue;
+
+        const effectiveJobType =
+            updateData.jobType ?? existingDrive.jobType;
+
+        const validationError = await validateDriveFields({
+            companyId: effectiveCompanyId,
+            packageAmount: effectivePackage,
+            driveDate: effectiveDriveDate,
+            deadline: effectiveDeadline,
+            jobType: effectiveJobType,
+            role: effectiveRole,
+            venue: effectiveVenue
+        });
+
+        if (validationError) {
+            return res.status(400).json({
+                success: false,
+                message: validationError
+            });
+        }
 
         const drive = await prisma.placementDrive.update({
             where: {
-                id: parseInt(id)
+                id: driveId
             },
             data: updateData
         });
@@ -180,14 +394,24 @@ const updateDrive = async (req, res) => {
         });
     }
 };
+
+
 // Delete Placement Drive
 const deleteDrive = async (req, res) => {
     try {
         const { id } = req.params;
+        const driveId = parseInt(id);
+
+        if (isNaN(driveId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid drive ID"
+            });
+        }
 
         const existingDrive = await prisma.placementDrive.findUnique({
             where: {
-                id: parseInt(id)
+                id: driveId
             }
         });
 
@@ -200,7 +424,7 @@ const deleteDrive = async (req, res) => {
 
         await prisma.placementDrive.delete({
             where: {
-                id: parseInt(id)
+                id: driveId
             }
         });
 
@@ -218,6 +442,8 @@ const deleteDrive = async (req, res) => {
         });
     }
 };
+
+
 module.exports = {
     createDrive,
     getAllDrives,
