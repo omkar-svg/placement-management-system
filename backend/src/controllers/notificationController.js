@@ -1,7 +1,7 @@
 // Notification Controller
 
 // Import the Prisma client to interact with the database.
-const prisma = require('../prisma');
+const prisma = require('../prismaClient');
 
 // Allowed notification types from the Prisma schema.
 const notificationTypes = [

@@ -1,7 +1,7 @@
 // Auth Controller - To be implemented
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const prisma = require("../prisma");
+const prisma = require("../prismaClient");
 
 // -------- register ----------
 const register = async (req, res) => {
