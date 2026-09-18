@@ -1,8 +1,8 @@
 // Company Controller - To be implemented
-const prisma = require("../prisma");
+const prisma = require("../prismaClient");
 
 // Create a new company
-const createCompany = async (req, res, next) => {
+const createCompany = async (req, res) => {
   try {
     // Trim inputs before validation so whitespace-only values are rejected too
     const companyName = req.body.companyName?.trim();
@@ -16,6 +16,20 @@ const createCompany = async (req, res, next) => {
         message: "Company name,about,location and website are required",
       });
     }
+
+    const existingCompany = await prisma.company.findFirst({
+      where: {
+        companyName,
+      },
+    });
+
+    if (existingCompany) {
+      return res.status(409).json({
+        success: false,
+        message: "A company with this name already exists",
+      });
+    }
+
     const company = await prisma.company.create({
       data: {
         companyName,
@@ -31,12 +45,6 @@ const createCompany = async (req, res, next) => {
       data: company,
     });
   } catch (error) {
-    if (error.code === "P2002") {
-      return res
-        .status(409)
-        .json({ success: false, message: "A company with this name already exists" });
-    }
-
     console.error("Create company error:", error);
 
     return res.status(500).json({
@@ -47,7 +55,7 @@ const createCompany = async (req, res, next) => {
 };
 
 // Get all companies
-const getCompanies = async (req, res, next) => {
+const getCompanies = async (req, res) => {
   try {
     const companies = await prisma.company.findMany({
       orderBy: {
@@ -71,7 +79,7 @@ const getCompanies = async (req, res, next) => {
 };
 
 // Get a company by its ID
-const getCompanyById = async (req, res, next) => {
+const getCompanyById = async (req, res) => {
   try {
     const companyId = Number(req.params.id);
 
@@ -114,7 +122,7 @@ const getCompanyById = async (req, res, next) => {
 };
 
 // Update an existing company by its ID
-const updateCompany = async (req, res, next) => {
+const updateCompany = async (req, res) => {
   try {
     const companyId = Number(req.params.id);
 
@@ -154,6 +162,22 @@ const updateCompany = async (req, res, next) => {
           message: "Company name cannot be empty",
         });
       }
+
+      const existingCompany = await prisma.company.findFirst({
+        where: {
+          companyName: trimmed,
+          NOT: {
+            id: companyId,
+          },
+        },
+      });
+
+      if (existingCompany) {
+        return res.status(409).json({
+          success: false,
+          message: "A company with this name already exists",
+        });
+      }
       data.companyName = trimmed;
     }
     if (about !== undefined) {
@@ -191,13 +215,6 @@ const updateCompany = async (req, res, next) => {
       data: updated,
     });
   } catch (error) {
-    if (error.code === "P2002") {
-      return res.status(409).json({
-        success: false,
-        message: "A company with this name already exists",
-      });
-    }
-
     console.error("Update company:", error);
 
     return res.status(500).json({
@@ -208,7 +225,7 @@ const updateCompany = async (req, res, next) => {
 };
 
 // Delete a company by its ID
-const deleteCompany = async (req, res, next) => {
+const deleteCompany = async (req, res) => {
   try {
     const companyId = Number(req.params.id);
 
@@ -226,6 +243,19 @@ const deleteCompany = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "Company not found",
+      });
+    }
+
+    const driveCount = await prisma.placementDrive.count({
+      where: {
+        companyId: companyId,
+      },
+    });
+
+    if (driveCount > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "Cannot delete company because it has existing placement drives",
       });
     }
 
