@@ -33,8 +33,24 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
-
 // JWT verification and role-based access control
 
+// * Restricts access to users with one of the specified roles.
+
+const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied"
+            });
+        }
+
+        next();
+    };
+};
+
+module.exports = authMiddleware;
+module.exports.authMiddleware = authMiddleware;
+module.exports.authorizeRoles = authorizeRoles;
 

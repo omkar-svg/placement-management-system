@@ -3,9 +3,11 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const prisma = require('./prismaClient');
 
 const authRoutes = require('./routes/authRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 
 dotenv.config();
 
@@ -23,6 +25,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded resume files
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, '../uploads'))
+);
 
 // ─── Health Check API ────────────────────────────────────
 
@@ -52,7 +60,7 @@ app.get('/api/health', async (req, res) => {
 
 // Routes will be registered here in next phase
 app.use('/api/auth', authRoutes);
-// app.use('/api/students', studentRoutes);
+app.use('/api/students', studentRoutes);
 // app.use('/api/companies', companyRoutes);
 // app.use('/api/drives', driveRoutes);
 // app.use('/api/notifications', notificationRoutes);
