@@ -51,33 +51,46 @@ const setEligibility = async (req, res) => {
             })
         }
 
-        //update or insert the criteria
-        const eligibilityCriteria = await prisma.eligibilityCriteria.upsert({
-            where: {
-                driveId: driveId
-            },
-            update: { //update the criteria
-                minCGPA: minCGPA,
-                maxBacklogs: maxBacklogs,
-                graduationYear: graduationYear
-            },
-            create: { //if criteria doesnt exists then create 
-                driveId: driveId,
-                minCGPA: minCGPA,
-                maxBacklogs: maxBacklogs,
-                graduationYear: graduationYear
-            }
-        })
+        //start atomic transaction for updating eligibility criteria
+        const eligibilityCriteria = await prisma.$transaction(async (tx) => {
 
-        //prepare branch data for insertion in db
-        const branchData = eligibleBranches.map((branch) => ({
-            eligibilityId: eligibilityCriteria.id,
-            branch: branch
-        }))
+            //update or insert the criteria
+            const criteria = await tx.eligibilityCriteria.upsert({
+                where: {
+                    driveId: driveId
+                },
+                update: {
+                    minCGPA: minCGPA,
+                    maxBacklogs: maxBacklogs,
+                    graduationYear: graduationYear
+                },
+                create: {
+                    driveId: driveId,
+                    minCGPA: minCGPA,
+                    maxBacklogs: maxBacklogs,
+                    graduationYear: graduationYear
+                }
+            })
 
-        //insert branch data in db
-        await prisma.eligibleBranch.createMany({
-            data: branchData
+            //delete previously stored branches for this eligibility criteria
+            await tx.eligibleBranch.deleteMany({
+                where: {
+                    eligibilityId: criteria.id
+                }
+            })
+
+            //prepare branch data for insertion in db
+            const branchData = eligibleBranches.map((branch) => ({
+                eligibilityId: criteria.id,
+                branch: branch
+            }))
+
+            //insert new branch data in db
+            await tx.eligibleBranch.createMany({
+                data: branchData
+            })
+
+            return criteria
         })
 
         return res.status(200).json({
@@ -100,13 +113,13 @@ const getEligibility = async (req, res) => {
     try {
 
         //get the driveId from the params which will be in string format
-        const {dId} = req.params
+        const { dId } = req.params
 
         //convert the driveId to int from string
         const driveId = Number(dId)
 
         //check if the driveId is parsed successfully or not
-        if(isNaN(driveId) || driveId <= 0){
+        if (isNaN(driveId) || driveId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "invalid drive ID"
@@ -119,7 +132,7 @@ const getEligibility = async (req, res) => {
                 id: driveId
             }
         })
-        if(!placementDrive){
+        if (!placementDrive) {
             return res.status(404).json({
                 success: false,
                 message: "drive doesnt exists"
@@ -136,7 +149,7 @@ const getEligibility = async (req, res) => {
             }
         })
 
-        if(!eligibilityCriteria){
+        if (!eligibilityCriteria) {
             return res.status(404).json({
                 success: false,
                 message: "eligibility criteria not found"
@@ -150,7 +163,7 @@ const getEligibility = async (req, res) => {
         })
 
     }
-    catch(error){
+    catch (error) {
         return res.status(500).json({
             success: false,
             message: "internal server error"
@@ -172,13 +185,13 @@ const getEligibleStudents = async (req, res) => {
         }
 
         //get the driveId from the params which will be in string format
-        const {dId} = req.params
+        const { dId } = req.params
 
         //convert the driveId to int from string
         const driveId = Number(dId)
 
         //check if the driveId is parsed successfully or not
-        if(isNaN(driveId) || driveId <= 0){
+        if (isNaN(driveId) || driveId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "invalid drive ID"
@@ -191,7 +204,7 @@ const getEligibleStudents = async (req, res) => {
                 id: driveId
             }
         })
-        if(!placementDrive){
+        if (!placementDrive) {
             return res.status(404).json({
                 success: false,
                 message: "drive doesnt exists"
@@ -207,7 +220,7 @@ const getEligibleStudents = async (req, res) => {
                 eligibleBranches: true
             }
         })
-        if(!eligibilityCriteria){
+        if (!eligibilityCriteria) {
             return res.status(404).json({
                 success: false,
                 message: "eligibility criteria not found"
@@ -230,12 +243,12 @@ const getEligibleStudents = async (req, res) => {
             const reasons = []
 
             //check minimum CGPA
-            if(student.cgpa < eligibilityCriteria.minCGPA){
+            if (student.cgpa < eligibilityCriteria.minCGPA) {
                 reasons.push("CGPA is lower than required CGPA")
             }
 
             //check maximum active backlogs
-            if(student.activeBacklogs > eligibilityCriteria.maxBacklogs){
+            if (student.activeBacklogs > eligibilityCriteria.maxBacklogs) {
                 reasons.push("active backlogs are more than allowed limit")
             }
 
@@ -243,7 +256,7 @@ const getEligibleStudents = async (req, res) => {
             const isBranchEligible = eligibilityCriteria.eligibleBranches.some(
                 (eligibleBranch) => eligibleBranch.branch === student.branch
             )
-            if(!isBranchEligible){
+            if (!isBranchEligible) {
                 reasons.push(" your branch is not eligible")
             }
 
@@ -251,15 +264,15 @@ const getEligibleStudents = async (req, res) => {
             const studentGraduationYear = student.year + 4 //+4 for all four years of college
 
             //check graduation year
-            if(studentGraduationYear !== eligibilityCriteria.graduationYear){
+            if (studentGraduationYear !== eligibilityCriteria.graduationYear) {
                 reasons.push("your graduation year does not match")
             }
 
             //add student to eligible or ineligible list
-            if(reasons.length === 0){ //passed all criterias
+            if (reasons.length === 0) { //passed all criterias
                 eligibleStudents.push(student)
             }
-            else{
+            else {
                 ineligibleStudents.push({
                     student: student,
                     reasons: reasons
@@ -278,7 +291,7 @@ const getEligibleStudents = async (req, res) => {
         })
 
     }
-    catch(error){
+    catch (error) {
         return res.status(500).json({
             success: false,
             message: "internal server error"
