@@ -1,5 +1,5 @@
 // Drive Controller - To be implemented
-const prisma = require('../prisma')
+const prisma = require('../prismaClient')
 
 //create or update eligibility criteria for placement drive
 const setEligibility = async (req, res) => {
