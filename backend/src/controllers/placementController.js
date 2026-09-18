@@ -4,7 +4,14 @@ const getPlacements = async (req, res) => {
     try {
         const placements = await prisma.placementStatus.findMany({
             include: {
-                student: true,
+                student: {
+                    select: {
+                        id: true,
+                        userId: true,
+                        branch: true,
+                        year: true
+                    }
+                },
                 drive: true
             }
         });
@@ -27,14 +34,27 @@ const getPlacements = async (req, res) => {
 
 const getPlacementById = async (req, res) => {
     try {
-        const { id } = req.params;
+        const placementId = Number(req.params.id);
 
+        if (!Number.isInteger(placementId) || placementId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid placement ID"
+            });
+        }
         const placement = await prisma.placementStatus.findUnique({
             where: {
-                id: Number(id)
+                id: placementId
             },
             include: {
-                student: true,
+                student: {
+                    select: {
+                        id: true,
+                        userId: true,
+                        branch: true,
+                        year: true
+                    }
+                },
                 drive: true
             }
         });
@@ -79,7 +99,15 @@ const getPlacementById = async (req, res) => {
 
 const updatePlacementStatus = async (req, res) => {
     try {
-        const { id } = req.params;
+        const placementId = Number(req.params.id);
+
+        if (!Number.isInteger(placementId) || placementId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid placement ID"
+            });
+        }
+
         const { status, remarks } = req.body;
 
         const validStatuses = [
@@ -107,7 +135,7 @@ const updatePlacementStatus = async (req, res) => {
 
         const existingPlacement = await prisma.placementStatus.findUnique({
             where: {
-                id: Number(id)
+                id: placementId
             }
         });
 
@@ -120,7 +148,7 @@ const updatePlacementStatus = async (req, res) => {
 
         const updatedPlacement = await prisma.placementStatus.update({
             where: {
-                id: Number(id)
+                id: placementId
             },
             data: {
                 status,
