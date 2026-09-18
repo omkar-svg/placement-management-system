@@ -5,10 +5,10 @@ const dotenv = require("dotenv");
 const prisma = require("./prismaClient");
 
 const authRoutes = require("./routes/authRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 
 dotenv.config();
-
 if (!process.env.JWT_SECRET?.trim()) {
   throw new Error("JWT_SECRET is not configured.");
 }
@@ -55,7 +55,7 @@ app.use("/api/auth", authRoutes);
 // app.use('/api/students', studentRoutes);
 app.use("/api/companies", companyRoutes);
 // app.use('/api/drives', driveRoutes);
-// app.use('/api/notifications', notificationRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
