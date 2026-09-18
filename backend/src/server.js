@@ -1,11 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const prisma = require('./prismaClient');
+// Backend Entry Point
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const prisma = require("./prismaClient");
 
 const authRoutes = require('./routes/authRoutes');
 const driveRoutes = require('./routes/driveRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const authRoutes = require("./routes/authRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const companyRoutes = require("./routes/companyRoutes");
 
 dotenv.config();
 if (!process.env.JWT_SECRET?.trim()) {
@@ -25,26 +29,26 @@ app.use(express.urlencoded({ extended: true }));
 
 // -- Health Check API ---------------------------------------------
 
-app.get('/api/health', async (req, res) => {
+app.get("/api/health", async (req, res) => {
   const healthData = {
-    status: 'OK',
-    message: 'Placement Management System API is running',
+    status: "OK",
+    message: "Placement Management System API is running",
     timestamp: new Date().toISOString(),
     uptime: `${Math.floor(process.uptime())}s`,
-    environment: process.env.NODE_ENV || 'development',
-    database: 'disconnected',
+    environment: process.env.NODE_ENV || "development",
+    database: "disconnected",
   };
 
   try {
     await prisma.$queryRaw`SELECT 1`;
-    healthData.database = 'connected';
+    healthData.database = "connected";
   } catch (error) {
-    healthData.status = 'DEGRADED';
-    healthData.database = 'disconnected';
+    healthData.status = "DEGRADED";
+    healthData.database = "disconnected";
     healthData.dbError = error.message;
   }
 
-  const statusCode = healthData.status === 'OK' ? 200 : 503;
+  const statusCode = healthData.status === "OK" ? 200 : 503;
   res.status(statusCode).json(healthData);
 });
 
@@ -54,6 +58,12 @@ app.use('/api/auth', authRoutes);
 // app.use('/api/companies', companyRoutes);
 app.use('/api/drives', driveRoutes);
 app.use('/api/notifications', notificationRoutes);
+// Routes will be registered here in next phase
+app.use("/api/auth", authRoutes);
+// app.use('/api/students', studentRoutes);
+app.use("/api/companies", companyRoutes);
+// app.use('/api/drives', driveRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
