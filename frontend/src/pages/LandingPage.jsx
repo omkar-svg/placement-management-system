@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
 const navigationLinks = [
-  { label: "Home", path: "/" },
-  { label: "Features", path: "/features" },
-  { label: "How It Works", path: "/how-it-works" },
-  { label: "Roles", path: "/roles" },
-  { label: "About Us", path: "/about" },
-  { label: "Contact", path: "/contact" },
+  { label: "Home", path: "#home" },
+  { label: "Features", path: "#features" },
+  { label: "How It Works", path: "#how-it-works" },
+  { label: "Roles", path: "#roles" },
+  { label: "About Us", path: "#about" },
+  { label: "Contact", path: "#contact" },
 ];
+
+/* =========================================================
+   FEATURES DATA
+========================================================= */
 
 const features = [
   {
@@ -49,6 +57,10 @@ const features = [
   },
 ];
 
+/* =========================================================
+   HOW IT WORKS DATA
+========================================================= */
+
 const placementSteps = [
   {
     number: "01",
@@ -77,10 +89,15 @@ const placementSteps = [
   {
     number: "05",
     title: "Get Placed",
-    description: "Move ahead in the process and achieve your career goals.",
+    description:
+      "Move ahead in the process and achieve your career goals.",
     type: "placed",
   },
 ];
+
+/* =========================================================
+   ROLES DATA
+========================================================= */
 
 const roles = [
   {
@@ -127,6 +144,10 @@ const roles = [
   },
 ];
 
+/* =========================================================
+   STATISTICS DATA
+========================================================= */
+
 const statistics = [
   ["500+", "Students"],
   ["180+", "Placed Students"],
@@ -136,17 +157,21 @@ const statistics = [
   ["100%", "Secure Platform"],
 ];
 
-/* ---------------- ICONS ---------------- */
+/* =========================================================
+   ARROW ICON
+========================================================= */
 
-/** Renders the arrow icon. */
 function ArrowIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-4 w-4"
+      className="h-4 w-4 shrink-0"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M5 12h13" />
       <path d="m13 6 6 6-6 6" />
@@ -154,15 +179,21 @@ function ArrowIcon() {
   );
 }
 
-/** Renders the menu icon. */
+/* =========================================================
+   MENU ICON
+========================================================= */
+
 function MenuIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-6 w-6"
+      className="h-6 w-6 shrink-0"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M4 7h16" />
       <path d="M4 12h16" />
@@ -171,15 +202,21 @@ function MenuIcon() {
   );
 }
 
-/** Renders the close icon. */
+/* =========================================================
+   CLOSE ICON
+========================================================= */
+
 function CloseIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-6 w-6"
+      className="h-6 w-6 shrink-0"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="m6 6 12 12" />
       <path d="m18 6-12 12" />
@@ -187,45 +224,20 @@ function CloseIcon() {
   );
 }
 
-/** Renders the sun icon. */
-function SunIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
-    </svg>
-  );
-}
+/* =========================================================
+   FEATURE ICON
+========================================================= */
 
-/** Renders the moon icon. */
-function MoonIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" />
-    </svg>
-  );
-}
-
-/** Renders a feature icon. */
 function FeatureIcon({ type }) {
   const props = {
     viewBox: "0 0 24 24",
-    className: "h-6 w-6",
+    className: "h-6 w-6 shrink-0",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: "1.8",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true",
   };
 
   if (type === "student") {
@@ -284,14 +296,20 @@ function FeatureIcon({ type }) {
   );
 }
 
-/** Renders an icon for a placement step. */
+/* =========================================================
+   STEP ICON
+========================================================= */
+
 function StepIcon({ type }) {
   const props = {
     viewBox: "0 0 24 24",
-    className: "h-6 w-6",
+    className: "h-6 w-6 shrink-0",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: "1.8",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true",
   };
 
   if (type === "profile") {
@@ -337,16 +355,22 @@ function StepIcon({ type }) {
   );
 }
 
-/* ---------------- NAVBAR ---------------- */
+/* =========================================================
+   NAVBAR
+========================================================= */
 
-/** Renders the responsive navigation bar with theme switching. */
-function Navbar({ darkMode, setDarkMode }) {
+function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#07152d] shadow-lg">
       <div className="mx-auto flex h-[78px] max-w-[1320px] items-center justify-between px-4 sm:px-7 lg:px-10">
-        <Link to="/" className="flex shrink-0 items-center gap-3">
+
+        {/* LOGO */}
+        <a
+          href="#home"
+          className="flex shrink-0 items-center gap-3"
+        >
           <img
             src="/DKTE-LOGO.png"
             alt="DKTE Logo"
@@ -357,103 +381,88 @@ function Navbar({ darkMode, setDarkMode }) {
             <p className="text-xs font-bold text-white">
               DKTE Society&apos;s
             </p>
+
             <p className="text-[10px] font-semibold text-white">
               Textile & Engineering Institute
             </p>
+
             <p className="text-[9px] text-slate-300">
               Ichalkaranji
             </p>
           </div>
-        </Link>
+        </a>
 
+        {/* DESKTOP NAVIGATION */}
         <nav className="hidden items-center gap-1 lg:flex">
           {navigationLinks.map((link) => (
-            <Link
+            <a
               key={link.label}
-              to={link.path}
-              className="rounded-lg px-3 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10 hover:text-[#ffc52c] xl:px-4"
+              href={link.path}
+              className="rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors hover:bg-white/10 hover:text-[#ffc52c] xl:px-4"
+              style={{ color: "#ffffff" }}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
+        {/* LOGIN */}
         <div className="hidden items-center gap-3 lg:flex">
-          {/* Theme switch */}
-          <button
-            type="button"
-            aria-label={
-              darkMode ? "Switch to light mode" : "Switch to dark mode"
-            }
-            onClick={() => setDarkMode((current) => !current)}
-            className="flex h-10 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-white transition hover:border-[#ffc52c] hover:text-[#ffc52c]"
-          >
-            {darkMode ? <MoonIcon /> : <SunIcon />}
-
-            <span className="text-[11px] font-semibold">
-              {darkMode ? "Dark" : "Light"}
-            </span>
-
-            <span className="relative h-5 w-9 rounded-full bg-white/20">
-              <span
-                className={`absolute top-0.5 h-4 w-4 rounded-full bg-[#ffc52c] transition-all ${
-                  darkMode ? "left-[17px]" : "left-0.5"
-                }`}
-              />
-            </span>
-          </button>
-
           <Link
-            to="/get-started"
-            className="inline-flex items-center gap-2 rounded-full bg-[#ffc52c] px-5 py-3 text-xs font-bold text-[#07152d] shadow-md transition hover:bg-[#ffd45c] hover:shadow-lg"
+            to="/login"
+            className="inline-flex items-center justify-center rounded-full border-2 px-5 py-3 text-xs font-bold transition-all duration-300 hover:border-[#ffc52c] hover:bg-white hover:text-[#07152d]"
+            style={{
+              color: "#ffffff",
+              borderColor: "rgba(255,255,255,0.7)",
+            }}
           >
-            Get Started
-            <ArrowIcon />
+            Login
           </Link>
         </div>
 
+        {/* MOBILE MENU BUTTON */}
         <button
           type="button"
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          onClick={() => setMobileMenuOpen((current) => !current)}
-          className="rounded-lg border border-white/25 p-2 text-white hover:bg-white/10 lg:hidden"
+          aria-label={
+            mobileMenuOpen ? "Close menu" : "Open menu"
+          }
+          onClick={() =>
+            setMobileMenuOpen((current) => !current)
+          }
+          className="rounded-lg border border-white/30 p-2 text-white transition-colors hover:bg-white/10 hover:text-[#ffc52c] lg:hidden"
         >
           {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
         </button>
       </div>
 
+      {/* MOBILE MENU */}
       {mobileMenuOpen && (
         <div className="border-t border-white/10 bg-[#07152d] px-5 py-5 lg:hidden">
           <nav className="flex flex-col gap-1">
             {navigationLinks.map((link) => (
-              <Link
+              <a
                 key={link.label}
-                to={link.path}
+                href={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 hover:text-[#ffc52c]"
+                className="rounded-lg px-4 py-3 text-sm font-semibold transition-colors hover:bg-white/10 hover:text-[#ffc52c]"
+                style={{ color: "#ffffff" }}
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
           </nav>
 
-          <div className="mt-4 flex gap-3">
-            <button
-              type="button"
-              onClick={() => setDarkMode((current) => !current)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-xs font-semibold text-white"
-            >
-              {darkMode ? <MoonIcon /> : <SunIcon />}
-              {darkMode ? "Dark Mode" : "Light Mode"}
-            </button>
-
+          <div className="mt-4">
             <Link
-              to="/get-started"
+              to="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#ffc52c] px-4 py-3 text-xs font-bold text-[#07152d]"
+              className="flex w-full items-center justify-center rounded-full border-2 px-4 py-3 text-xs font-bold transition-colors hover:border-[#ffc52c] hover:bg-white hover:text-[#07152d]"
+              style={{
+                color: "#ffffff",
+                borderColor: "rgba(255,255,255,0.7)",
+              }}
             >
-              Get Started
-              <ArrowIcon />
+              Login
             </Link>
           </div>
         </div>
@@ -462,12 +471,16 @@ function Navbar({ darkMode, setDarkMode }) {
   );
 }
 
-/* ---------------- HERO ---------------- */
+/* =========================================================
+   HERO SECTION
+========================================================= */
 
-/** Renders the hero section. */
 function HeroSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#07152d] pt-[78px]">
+    <section
+      id="home"
+      className="relative isolate overflow-hidden bg-[#07152d] pt-[78px]"
+    >
       <div className="absolute inset-0">
         <img
           src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=2000&q=90"
@@ -476,13 +489,15 @@ function HeroSection() {
         />
 
         <div className="absolute inset-0 bg-gradient-to-r from-[#07152d] via-[#07152d]/90 to-[#07152d]/30" />
+
         <div className="absolute inset-0 bg-gradient-to-t from-[#07152d] via-transparent to-[#07152d]/20" />
       </div>
 
       <div className="relative mx-auto flex min-h-[620px] max-w-[1320px] items-center px-5 py-16 sm:px-8 lg:px-10">
         <div className="max-w-[650px]">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ffc52c]/30 bg-[#ffc52c]/10 px-4 py-2 text-[10px] font-bold tracking-[0.12em] text-[#ffc52c] uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#ffc52c]" />
+
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ffc52c]/40 bg-[#ffc52c]/10 px-4 py-2 text-[10px] font-bold tracking-[0.12em] text-[#ffc52c] uppercase">
+            <span className="h-2 w-2 rounded-full bg-[#ffc52c]" />
             DKTE Placement Management System
           </div>
 
@@ -494,29 +509,35 @@ function HeroSection() {
           </h1>
 
           <p className="mt-6 max-w-[580px] text-base leading-7 text-slate-200 sm:text-lg">
-            A unified platform to manage students, companies, placement
-            drives, eligibility and placement progress with ease and
-            efficiency.
+            A unified platform to manage students, companies,
+            placement drives, eligibility and placement progress
+            with ease and efficiency.
           </p>
 
+          {/* HERO BUTTONS */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
             <Link
-              to="/get-started"
-              className="inline-flex items-center justify-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition hover:-translate-y-1 hover:bg-[#ffd45c]"
+              to="/login"
+              className="inline-flex items-center justify-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition-all duration-300 hover:-translate-y-1 hover:bg-[#ffd45c]"
             >
-              Get Started Now
+              Login
               <ArrowIcon />
             </Link>
 
-            <Link
-              to="/features"
-              className="inline-flex items-center justify-center gap-3 rounded-full border border-white/50 bg-white/5 px-7 py-4 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+            {/* VISIBILITY FIX ONLY */}
+            <a
+              href="#features"
+              className="inline-flex items-center justify-center gap-3 rounded-full border border-white/70 bg-white/10 px-7 py-4 text-sm font-semibold backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20"
+              style={{ color: "#ffffff" }}
             >
               Explore Features
               <ArrowIcon />
-            </Link>
+            </a>
+
           </div>
 
+          {/* HERO STATISTICS */}
           <div className="mt-10 grid grid-cols-2 gap-y-5 border-t border-white/15 pt-7 sm:grid-cols-4 sm:gap-0">
             {[
               ["500+", "Students"],
@@ -528,18 +549,25 @@ function HeroSection() {
                 key={label}
                 className="border-white/10 sm:border-r sm:px-5 first:sm:pl-0 last:sm:border-r-0"
               >
-                <p className="text-xl font-bold text-[#ffc52c]">{value}</p>
-                <p className="mt-1 text-xs text-slate-300">{label}</p>
+                <p className="text-xl font-bold text-[#ffc52c]">
+                  {value}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-300">
+                  {label}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
+      {/* UPCOMING DRIVE */}
       <div className="relative mx-auto -mt-2 max-w-[1080px] px-5 pb-7 sm:px-8">
-        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#111f3a] px-5 py-4 shadow-2xl sm:flex-row sm:px-7">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-white/15 bg-[#111f3a] px-5 py-4 shadow-2xl sm:flex-row sm:px-7">
+
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ffc52c] text-sm text-[#07152d]">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ffc52c] text-sm font-bold text-[#07152d]">
               !
             </span>
 
@@ -547,38 +575,41 @@ function HeroSection() {
               <p className="text-[10px] font-semibold tracking-wider text-[#ffc52c] uppercase">
                 Upcoming Placement Drive
               </p>
+
               <p className="mt-1 text-xs text-white sm:text-sm">
-                TCS Digital Campus Drive on 25 May 2024
+                TCS Digital Campus Drive on 25 May 2026
               </p>
             </div>
           </div>
 
-          <Link
-            to="/placement-drives"
-            className="flex items-center gap-2 text-xs font-bold text-[#ffc52c] hover:text-white"
+          <a
+            href="#roles"
+            className="inline-flex items-center gap-2 text-xs font-bold text-[#ffc52c] transition-colors hover:text-white"
           >
             View All Drives
             <ArrowIcon />
-          </Link>
+          </a>
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------------- FEATURES ---------------- */
+/* =========================================================
+   FEATURE CARD
+========================================================= */
 
-/** Renders a single feature card. */
 function FeatureCard({ feature }) {
   const isAnalytics = feature.type === "analytics";
 
   return (
-    <article className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <article className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+
       <div
-        className={`flex h-12 w-12 items-center justify-center rounded-xl ${
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
           isAnalytics
             ? "bg-purple-100 text-purple-700"
-            : "bg-[#edf3fb] text-[#0b2854]"
+            : "bg-[#e8f0fa] text-[#0b2854]"
         }`}
       >
         <FeatureIcon type={feature.type} />
@@ -592,24 +623,28 @@ function FeatureCard({ feature }) {
         {feature.description}
       </p>
 
-      <Link
-        to="/features"
-        className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#0b2854] group-hover:text-[#a17b00]"
+      <a
+        href="#features"
+        className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#0b2854] transition-colors hover:text-[#a17b00]"
       >
         Explore
         <ArrowIcon />
-      </Link>
+      </a>
     </article>
   );
 }
 
-/** Renders the features section. */
+/* =========================================================
+   FEATURES SECTION
+========================================================= */
+
 function FeaturesSection() {
   return (
-    <section className="bg-[#f7f9fc] py-20">
+    <section id="features" className="bg-[#f7f9fc] py-20">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
             Powerful Modules
           </p>
 
@@ -618,28 +653,34 @@ function FeaturesSection() {
           </h2>
 
           <p className="mt-4 text-sm leading-6 text-slate-500">
-            A centralized system designed to simplify every stage of campus
-            placements.
+            A centralized system designed to simplify every stage
+            of campus placements.
           </p>
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
+            <FeatureCard
+              key={feature.title}
+              feature={feature}
+            />
           ))}
         </div>
+
       </div>
     </section>
   );
 }
 
-/* ---------------- HOW IT WORKS ---------------- */
+/* =========================================================
+   PLACEMENT STEP
+========================================================= */
 
-/** Renders one placement journey step. */
 function PlacementStep({ step }) {
   return (
     <div className="relative flex flex-1 flex-col items-center text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-[#17274b] text-[#ffc52c]">
+
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-[#ffc52c]/50 bg-[#17274b] text-[#ffc52c]">
         <StepIcon type={step.type} />
       </div>
 
@@ -647,23 +688,36 @@ function PlacementStep({ step }) {
         {step.number}
       </span>
 
-      <h3 className="mt-2 text-sm font-bold text-white">{step.title}</h3>
+      <h3 className="mt-2 text-sm font-bold text-white">
+        {step.title}
+      </h3>
 
       <p className="mt-2 max-w-[160px] text-xs leading-5 text-slate-300">
         {step.description}
       </p>
+
     </div>
   );
 }
 
-/** Renders the how-it-works section. */
+/* =========================================================
+   HOW IT WORKS SECTION
+========================================================= */
+
 function HowItWorksSection() {
   return (
-    <section className="bg-[#0b1f3a] py-20">
+    <section
+      id="how-it-works"
+      className="bg-[#0b1f3a] py-20"
+    >
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+
         <div className="rounded-3xl bg-gradient-to-br from-[#07152d] to-[#211653] px-6 py-12 shadow-2xl sm:px-10 lg:px-12">
+
           <div className="grid gap-12 lg:grid-cols-[270px_1fr] lg:items-center">
+
             <div>
+
               <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
                 How It Works
               </p>
@@ -673,61 +727,81 @@ function HowItWorksSection() {
               </h2>
 
               <p className="mt-4 text-sm leading-6 text-slate-300">
-                A simple five-step journey from creating your profile to
-                achieving your placement goal.
+                A simple five-step journey from creating your profile
+                to achieving your placement goal.
               </p>
 
-              <Link
-                to="/how-it-works"
-                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#ffc52c] px-6 py-3 text-xs font-bold text-[#07152d]"
+              <a
+                href="#how-it-works"
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#ffc52c] px-6 py-3 text-xs font-bold text-[#07152d] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ffd45c]"
               >
                 Learn More
                 <ArrowIcon />
-              </Link>
+              </a>
+
             </div>
 
             <div className="grid gap-10 sm:grid-cols-2 lg:flex lg:gap-0">
               {placementSteps.map((step) => (
-                <PlacementStep key={step.number} step={step} />
+                <PlacementStep
+                  key={step.number}
+                  step={step}
+                />
               ))}
             </div>
+
           </div>
         </div>
+
       </div>
     </section>
   );
 }
 
-/* ---------------- ROLES ---------------- */
+/* =========================================================
+   ROLE THEME
+========================================================= */
 
-/** Returns the styling theme for a role. */
 function getRoleTheme(type) {
   if (type === "student") {
     return {
       card: "bg-[#fff8e5]",
-      title: "text-[#10284b]",
+      title: "text-[#0b1f3a]",
       text: "text-slate-600",
       button: "bg-[#ffc52c] text-[#07152d]",
     };
   }
 
+  if (type === "tpo") {
+    return {
+      card: "bg-[#0b2854]",
+      title: "text-white",
+      text: "text-slate-300",
+      button: "bg-[#ffc52c] text-[#07152d]",
+    };
+  }
+
   return {
-    card: "bg-[#0b2854]",
+    card: "bg-[#07152d]",
     title: "text-white",
     text: "text-slate-300",
-    button: "bg-white/10 text-white",
+    button: "bg-[#ffc52c] text-[#07152d]",
   };
 }
 
-/** Renders a role card. */
+/* =========================================================
+   ROLE CARD
+========================================================= */
+
 function RoleCard({ role }) {
   const theme = getRoleTheme(role.type);
 
   return (
     <article
-      className={`overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
+      className={`overflow-hidden rounded-2xl border border-slate-200/20 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
     >
       <div className="grid min-h-[300px] grid-cols-[40%_60%]">
+
         <div className="overflow-hidden">
           <img
             src={role.image}
@@ -737,15 +811,20 @@ function RoleCard({ role }) {
         </div>
 
         <div className="flex flex-col p-5">
-          <span className="text-[10px] font-bold tracking-widest uppercase opacity-70">
+
+          <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase">
             Placement Role
           </span>
 
-          <h3 className={`mt-2 text-xl font-bold ${theme.title}`}>
+          <h3
+            className={`mt-2 text-xl font-bold ${theme.title}`}
+          >
             {role.title}
           </h3>
 
-          <p className={`mt-2 text-xs leading-5 ${theme.text}`}>
+          <p
+            className={`mt-2 text-xs leading-5 ${theme.text}`}
+          >
             {role.description}
           </p>
 
@@ -755,31 +834,40 @@ function RoleCard({ role }) {
                 key={point}
                 className={`flex items-center gap-2 text-[10px] font-medium ${theme.text}`}
               >
-                <span className="text-[#ffc52c]">✓</span>
+                <span className="font-bold text-[#ffc52c]">
+                  ✓
+                </span>
+
                 {point}
               </li>
             ))}
           </ul>
 
-          <Link
-            to="/roles"
-            className={`mt-auto flex h-8 w-8 items-center justify-center self-end rounded-full ${theme.button}`}
+          <a
+            href="#roles"
+            aria-label={`View ${role.title} role`}
+            className={`mt-auto flex h-9 w-9 shrink-0 items-center justify-center self-end rounded-full transition-transform duration-200 hover:translate-x-1 ${theme.button}`}
           >
             <ArrowIcon />
-          </Link>
+          </a>
+
         </div>
       </div>
     </article>
   );
 }
 
-/** Renders the roles section. */
+/* =========================================================
+   ROLES SECTION
+========================================================= */
+
 function RolesSection() {
   return (
-    <section className="bg-white py-20">
+    <section id="roles" className="bg-white py-20">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+
         <div>
-          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
             One Platform. Three Roles.
           </p>
 
@@ -790,24 +878,33 @@ function RolesSection() {
 
         <div className="mt-10 grid gap-5 lg:grid-cols-3">
           {roles.map((role) => (
-            <RoleCard key={role.title} role={role} />
+            <RoleCard
+              key={role.title}
+              role={role}
+            />
           ))}
         </div>
+
       </div>
     </section>
   );
 }
 
-/* ---------------- STATISTICS ---------------- */
+/* =========================================================
+   STATISTICS SECTION
+========================================================= */
 
-/** Renders the statistics section. */
 function StatisticsSection() {
   return (
     <section className="bg-[#07152d] py-10">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
+
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {statistics.map(([value, label]) => (
-            <div key={label} className="px-4 py-4 text-center">
+            <div
+              key={label}
+              className="px-4 py-4 text-center"
+            >
               <p className="text-2xl font-bold text-[#ffc52c] sm:text-3xl">
                 {value}
               </p>
@@ -818,20 +915,24 @@ function StatisticsSection() {
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
 }
 
-/* ---------------- ABOUT ---------------- */
+/* =========================================================
+   ABOUT SECTION
+========================================================= */
 
-/** Renders the about section. */
 function AboutSection() {
   return (
-    <section className="bg-[#f7f9fc] py-20">
+    <section id="about" className="bg-[#f7f9fc] py-20">
       <div className="mx-auto grid max-w-[1240px] gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-10">
+
         <div>
-          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
             About Us
           </p>
 
@@ -840,22 +941,28 @@ function AboutSection() {
           </h2>
 
           <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
-            The DKTE Placement Management System brings students, placement
-            activities, companies and administrators together on one
-            organized platform.
+            The DKTE Placement Management System brings students,
+            placement activities, companies and administrators
+            together on one organized platform.
           </p>
 
-          <Link
-            to="/about"
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#0b1f3a] px-6 py-3 text-xs font-bold text-white transition hover:bg-[#12345f]"
+          {/* VISIBILITY FIX ONLY */}
+          <a
+            href="#about"
+            className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#0b1f3a] px-6 py-3 text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#12345f]"
+            style={{ color: "#ffffff" }}
           >
-            Learn About Us
+            Learn More About Us
             <ArrowIcon />
-          </Link>
+          </a>
+
         </div>
 
+        {/* DASHBOARD PREVIEW */}
         <div className="rounded-3xl bg-white p-4 shadow-xl">
+
           <div className="rounded-2xl bg-[#0b1f3a] p-6">
+
             <p className="text-[9px] tracking-widest text-slate-400 uppercase">
               Placement Dashboard
             </p>
@@ -874,119 +981,160 @@ function AboutSection() {
                   key={label}
                   className="rounded-xl bg-white/10 p-3 text-center"
                 >
-                  <p className="text-lg font-bold text-[#ffc52c]">{value}</p>
-                  <p className="mt-1 text-[8px] text-slate-300">{label}</p>
+                  <p className="text-lg font-bold text-[#ffc52c]">
+                    {value}
+                  </p>
+
+                  <p className="mt-1 text-[8px] text-slate-300">
+                    {label}
+                  </p>
                 </div>
               ))}
             </div>
 
             <div className="mt-5 flex h-28 items-end gap-2 rounded-xl bg-white/5 p-4">
-              {[35, 48, 42, 65, 58, 78, 70, 90].map((height, index) => (
-                <div
-                  key={index}
-                  className="flex-1 rounded-t bg-[#ffc52c]"
-                  style={{ height: `${height}px` }}
-                />
-              ))}
+              {[35, 48, 42, 65, 58, 78, 70, 90].map(
+                (height, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 rounded-t bg-[#ffc52c]"
+                    style={{ height: `${height}px` }}
+                  />
+                )
+              )}
             </div>
+
           </div>
         </div>
+
       </div>
     </section>
   );
 }
 
-/* ---------------- CTA ---------------- */
+/* =========================================================
+   FINAL CTA
+========================================================= */
 
-/** Renders the final call-to-action section. */
 function FinalCTA() {
   return (
     <section className="bg-[#211653]">
       <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-8 px-5 py-12 sm:px-8 md:flex-row md:items-center lg:px-10">
+
         <div>
+
           <p className="text-[10px] font-bold tracking-[0.2em] text-[#ffc52c] uppercase">
-            Your Next Chapter Starts Here
+            Welcome to the Placement Portal
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-            Ready to Simplify Placements?
+            Ready to Access Your Placement Portal?
           </h2>
 
           <p className="mt-2 text-sm text-slate-300">
-            Take the first step towards a smarter placement process.
+            Login to continue with your placement journey.
           </p>
+
         </div>
 
         <Link
-          to="/get-started"
-          className="inline-flex items-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition hover:bg-[#ffd45c]"
+          to="/login"
+          className="inline-flex items-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition-all duration-300 hover:-translate-y-1 hover:bg-[#ffd45c]"
         >
-          Get Started Now
+          Login
           <ArrowIcon />
         </Link>
+
       </div>
     </section>
   );
 }
 
-/* ---------------- FOOTER ---------------- */
+/* =========================================================
+   FOOTER
+========================================================= */
 
-/** Renders the site footer. */
 function Footer() {
   return (
-    <footer className="bg-[#07152d] text-white">
+    <footer
+      id="contact"
+      className="bg-[#07152d] text-white"
+    >
       <div className="mx-auto max-w-[1240px] px-5 py-12 sm:px-8 lg:px-10">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <img
-              src="/DKTE-LOGO.png"
-              alt="DKTE Logo"
-              className="h-10 w-auto"
-            />
 
-            <p className="mt-4 text-xs font-bold">DKTE Society&apos;s</p>
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+
+          {/* BRAND */}
+          <div>
+
+            <a href="#home">
+              <img
+                src="/DKTE-LOGO.png"
+                alt="DKTE Logo"
+                className="h-10 w-auto"
+              />
+            </a>
+
+            <p className="mt-4 text-xs font-bold">
+              DKTE Society&apos;s
+            </p>
 
             <p className="mt-1 text-xs text-slate-300">
               Textile & Engineering Institute, Ichalkaranji
             </p>
+
           </div>
 
+          {/* QUICK LINKS */}
           <div>
-            <h3 className="text-sm font-bold">Quick Links</h3>
+
+            <h3 className="text-sm font-bold">
+              Quick Links
+            </h3>
 
             <ul className="mt-4 space-y-2">
               {navigationLinks.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.path}
-                    className="text-xs text-slate-400 hover:text-[#ffc52c]"
+                  <a
+                    href={link.path}
+                    className="text-xs text-slate-400 transition-colors hover:text-[#ffc52c]"
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
+
           </div>
 
+          {/* FEATURES */}
           <div>
-            <h3 className="text-sm font-bold">Features</h3>
+
+            <h3 className="text-sm font-bold">
+              Features
+            </h3>
 
             <ul className="mt-4 space-y-2">
               {features.map((feature) => (
                 <li key={feature.title}>
-                  <Link
-                    to="/features"
-                    className="text-xs text-slate-400 hover:text-[#ffc52c]"
+                  <a
+                    href="#features"
+                    className="text-xs text-slate-400 transition-colors hover:text-[#ffc52c]"
                   >
                     {feature.title}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
+
           </div>
 
+          {/* SUPPORT */}
           <div>
-            <h3 className="text-sm font-bold">Support</h3>
+
+            <h3 className="text-sm font-bold">
+              Support
+            </h3>
 
             <ul className="mt-4 space-y-2">
               {[
@@ -997,49 +1145,61 @@ function Footer() {
                 "Contact Support",
               ].map((item) => (
                 <li key={item}>
-                  <Link
-                    to="/contact"
-                    className="text-xs text-slate-400 hover:text-[#ffc52c]"
+                  <a
+                    href="#contact"
+                    className="text-xs text-slate-400 transition-colors hover:text-[#ffc52c]"
                   >
                     {item}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
+
           </div>
+
         </div>
 
+        {/* COPYRIGHT */}
         <div className="mt-10 border-t border-white/10 pt-6 text-center">
+
           <p className="text-[10px] text-slate-500">
-            © 2024 DKTE Society&apos;s Textile & Engineering Institute. All
-            rights reserved.
+            © 2024 DKTE Society&apos;s Textile & Engineering
+            Institute. All rights reserved.
           </p>
+
         </div>
+
       </div>
     </footer>
   );
 }
 
-/* ---------------- MAIN PAGE ---------------- */
+/* =========================================================
+   MAIN LANDING PAGE
+========================================================= */
 
-/** Renders the complete landing page and controls its theme. */
 function LandingPage() {
-  const [darkMode, setDarkMode] = useState(false);
-
   return (
-    <div className={darkMode ? "dark" : ""}>
-      <div className="min-h-screen bg-white text-[#0b1f3a] transition-colors duration-300 dark:bg-[#07152d] dark:text-white">
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+    <div className="min-h-screen bg-white text-[#0b1f3a]">
 
-        <HeroSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <RolesSection />
-        <StatisticsSection />
-        <AboutSection />
-        <FinalCTA />
-        <Footer />
-      </div>
+      <Navbar />
+
+      <HeroSection />
+
+      <FeaturesSection />
+
+      <HowItWorksSection />
+
+      <RolesSection />
+
+      <StatisticsSection />
+
+      <AboutSection />
+
+      <FinalCTA />
+
+      <Footer />
+
     </div>
   );
 }
