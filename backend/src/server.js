@@ -7,6 +7,7 @@ const prisma = require("./prismaClient");
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const companyRoutes = require("./routes/companyRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 dotenv.config();
 if (!process.env.JWT_SECRET?.trim()) {
@@ -56,6 +57,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/companies", companyRoutes);
 // app.use('/api/drives', driveRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/reports/placement", reportRoutes);
 
 const PORT = process.env.PORT || 5000;
 
