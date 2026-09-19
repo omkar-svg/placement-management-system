@@ -4,10 +4,13 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const prisma = require("./prismaClient");
 
+
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const placementRoutes = require("./routes/placementRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+
 
 dotenv.config();
 if (!process.env.JWT_SECRET?.trim()) {
@@ -57,6 +60,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/companies", companyRoutes);
 // app.use('/api/drives', driveRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/placements", placementRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 const PORT = process.env.PORT || 5000;
