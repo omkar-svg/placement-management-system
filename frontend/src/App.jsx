@@ -9,7 +9,6 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<Navigate to="/login" replace />} />
-      <Route path="/get-started" element={<Navigate to="/login" replace />} />
       <Route path="/student/dashboard" element={<StudentDashboard />} />
     </Routes>
   )
