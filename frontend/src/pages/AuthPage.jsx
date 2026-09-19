@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
 
-const ROLES = ['STUDENT', 'TPO', 'ADMIN'];
+const ROLES = ['STUDENT', 'TPO'];
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -51,6 +51,7 @@ export default function AuthPage() {
 
     if (!isLogin) {
       if (!cleanName) return setStatus({ error: 'Full name is required.', success: '', loading: false });
+      if (!ROLES.includes(role)) return setStatus({ error: 'Invalid role selected.', success: '', loading: false });
       if (password.length < 6) return setStatus({ error: 'Password must be at least 6 characters.', success: '', loading: false });
       if (password !== confirmPassword) return setStatus({ error: 'Passwords do not match.', success: '', loading: false });
     }
@@ -181,14 +182,14 @@ export default function AuthPage() {
 
             {!isLogin && (
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Role</label>
-                <div className="grid grid-cols-3 gap-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Register As</label>
+                <div className="grid grid-cols-2 gap-3">
                   {ROLES.map((r) => (
                     <button
                       key={r}
                       type="button"
                       onClick={() => setForm({ ...form, role: r })}
-                      className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2.5 px-3 text-xs font-bold rounded-lg border transition-all ${
                         form.role === r
                           ? r === 'STUDENT'
                             ? 'border-amber-400 bg-amber-50 text-[#0b1528] ring-2 ring-amber-300'
@@ -196,7 +197,7 @@ export default function AuthPage() {
                           : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
                       }`}
                     >
-                      {r === 'STUDENT' ? '🎓 Student' : r === 'TPO' ? '🏢 TPO' : '🛡️ Admin'}
+                      {r === 'STUDENT' ? '🎓 Student' : '🏢 TPO / Coordinator'}
                     </button>
                   ))}
                 </div>
