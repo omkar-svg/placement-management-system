@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
-
-const ROLES = ['STUDENT', 'TPO'];
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const [isLogin, setIsLogin] = useState(location.pathname !== '/register');
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'STUDENT' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState({ error: '', success: '', loading: false });
 
@@ -21,27 +17,17 @@ export default function AuthPage() {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    setIsLogin(location.pathname !== '/register');
-    setStatus({ error: '', success: '', loading: false });
-  }, [location.pathname]);
-
   const updateField = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const switchMode = (toLogin) => {
-    navigate(toLogin ? '/login' : '/register');
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ error: '', success: '', loading: true });
 
-    const { name, email, password, confirmPassword, role } = form;
+    const { email, password } = form;
     const cleanEmail = email.trim().toLowerCase();
-    const cleanName = name.trim();
 
     if (!cleanEmail || !password) {
-      return setStatus({ error: 'Please enter all required fields.', success: '', loading: false });
+      return setStatus({ error: 'Please enter both email and password.', success: '', loading: false });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -49,34 +35,20 @@ export default function AuthPage() {
       return setStatus({ error: 'Please enter a valid email address.', success: '', loading: false });
     }
 
-    if (!isLogin) {
-      if (!cleanName) return setStatus({ error: 'Full name is required.', success: '', loading: false });
-      if (!ROLES.includes(role)) return setStatus({ error: 'Invalid role selected.', success: '', loading: false });
-      if (password.length < 6) return setStatus({ error: 'Password must be at least 6 characters.', success: '', loading: false });
-      if (password !== confirmPassword) return setStatus({ error: 'Passwords do not match.', success: '', loading: false });
-    }
-
     try {
-      if (isLogin) {
-        const res = await authService.login({ email: cleanEmail, password });
-        if (res?.success) {
-          setStatus({ error: '', success: 'Signed in successfully! Redirecting...', loading: false });
-          setTimeout(() => navigate('/'), 500);
-        } else {
-          setStatus({ error: res?.message || 'Invalid credentials.', success: '', loading: false });
-        }
+      const res = await authService.login({ email: cleanEmail, password });
+      if (res?.success) {
+        setStatus({ error: '', success: 'Signed in successfully! Redirecting...', loading: false });
+        const role = res?.data?.user?.role;
+        setTimeout(() => {
+          navigate(role === 'STUDENT' ? '/student/dashboard' : '/');
+        }, 500);
       } else {
-        const res = await authService.register({ name: cleanName, email: cleanEmail, password, role });
-        if (res?.success) {
-          setStatus({ error: '', success: 'Account created! Switching to Sign In...', loading: false });
-          setTimeout(() => switchMode(true), 1200);
-        } else {
-          setStatus({ error: res?.message || 'Registration failed.', success: '', loading: false });
-        }
+        setStatus({ error: res?.message || 'Invalid credentials.', success: '', loading: false });
       }
     } catch (err) {
       setStatus({
-        error: err.response?.data?.message || (isLogin ? 'Login failed.' : 'Registration failed. Email might exist.'),
+        error: err.response?.data?.message || 'Invalid email or password.',
         success: '',
         loading: false,
       });
@@ -107,33 +79,11 @@ export default function AuthPage() {
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 sm:p-10">
           <div className="text-center mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#0b1528] tracking-tight">
-              {isLogin ? 'Sign In' : 'Create Account'}
+              Sign In
             </h1>
             <p className="text-sm text-slate-500 mt-1.5">
-              {isLogin ? 'Enter your details to access the placement portal.' : 'Register to apply for upcoming placement drives.'}
+              Enter your college credentials to access the placement portal.
             </p>
-          </div>
-
-          {/* Mode Switcher Tabs */}
-          <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
-            <button
-              type="button"
-              onClick={() => switchMode(true)}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-                isLogin ? 'bg-[#0b1528] text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode(false)}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-                !isLogin ? 'bg-[#0b1528] text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Register
-            </button>
           </div>
 
           {/* Feedback Alerts */}
@@ -150,22 +100,6 @@ export default function AuthPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {!isLogin && (
-              <div>
-                <label htmlFor="auth-name" className="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
-                <input
-                  id="auth-name"
-                  name="name"
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={updateField}
-                  placeholder="e.g. Omkar Gaikwad"
-                  className="w-full h-11 px-4 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0b1528]"
-                />
-              </div>
-            )}
-
             <div>
               <label htmlFor="auth-email" className="block text-sm font-semibold text-slate-700 mb-1">College Email</label>
               <input
@@ -179,30 +113,6 @@ export default function AuthPage() {
                 className="w-full h-11 px-4 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0b1528]"
               />
             </div>
-
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Register As</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {ROLES.map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setForm({ ...form, role: r })}
-                      className={`py-2.5 px-3 text-xs font-bold rounded-lg border transition-all ${
-                        form.role === r
-                          ? r === 'STUDENT'
-                            ? 'border-amber-400 bg-amber-50 text-[#0b1528] ring-2 ring-amber-300'
-                            : 'border-slate-800 bg-[#0b1528] text-white ring-2 ring-slate-700'
-                          : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      {r === 'STUDENT' ? '🎓 Student' : '🏢 TPO / Coordinator'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <div>
               <label htmlFor="auth-password" className="block text-sm font-semibold text-slate-700 mb-1">Password</label>
@@ -227,42 +137,19 @@ export default function AuthPage() {
               </div>
             </div>
 
-            {!isLogin && (
-              <div>
-                <label htmlFor="auth-confirm" className="block text-sm font-semibold text-slate-700 mb-1">Confirm Password</label>
-                <input
-                  id="auth-confirm"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={form.confirmPassword}
-                  onChange={updateField}
-                  placeholder="Repeat password"
-                  className="w-full h-11 px-4 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0b1528]"
-                />
-              </div>
-            )}
-
             {/* Main CTA: Golden Yellow */}
             <button
               type="submit"
               disabled={status.loading}
               className="w-full h-11 bg-amber-400 hover:bg-amber-300 text-[#0b1528] font-bold rounded-lg transition-colors text-sm shadow-sm cursor-pointer disabled:opacity-60 mt-2"
             >
-              {status.loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+              {status.loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          {/* Toggle link */}
-          <p className="text-center text-sm text-slate-600 mt-6">
-            {isLogin ? "Don't have an account? " : 'Already have an account? '}
-            <button
-              type="button"
-              onClick={() => switchMode(!isLogin)}
-              className="font-bold text-[#0b1528] hover:underline cursor-pointer"
-            >
-              {isLogin ? 'Register' : 'Sign in'}
-            </button>
+          {/* Institutional Note */}
+          <p className="text-center text-xs text-slate-500 mt-6 leading-relaxed">
+            Need an account? Contact your departmental TPO coordinator or administrative office to get registered.
           </p>
         </div>
       </main>
