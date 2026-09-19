@@ -56,12 +56,12 @@ app.get("/api/health", async (req, res) => {
 // Routes will be registered here in next phase
 app.use("/api/auth", authRoutes);
 // app.use('/api/students', studentRoutes);
+app.use('/api/drives', driveRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use("/api/companies", companyRoutes);
-// app.use('/api/drives', driveRoutes);
 
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/placements', placementRoutes);
-
 
 const PORT = process.env.PORT || 5000;
 
