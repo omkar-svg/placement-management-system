@@ -28,6 +28,7 @@ export default function AuthPage() {
     e.preventDefault();
     setStatus({ error: '', success: '', loading: true });
 
+    const { name, email, password, confirmPassword, role } = form;
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = name.trim();
 
