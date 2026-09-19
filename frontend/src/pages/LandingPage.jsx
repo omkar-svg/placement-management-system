@@ -77,7 +77,8 @@ const placementSteps = [
   {
     number: "05",
     title: "Get Placed",
-    description: "Move ahead in the process and achieve your career goals.",
+    description:
+      "Move ahead in the process and achieve your career goals.",
     type: "placed",
   },
 ];
@@ -136,9 +137,8 @@ const statistics = [
   ["100%", "Secure Platform"],
 ];
 
-/* ---------------- ICONS ---------------- */
+/* ================= ICONS ================= */
 
-/** Renders the arrow icon. */
 function ArrowIcon() {
   return (
     <svg
@@ -154,7 +154,6 @@ function ArrowIcon() {
   );
 }
 
-/** Renders the menu icon. */
 function MenuIcon() {
   return (
     <svg
@@ -171,7 +170,6 @@ function MenuIcon() {
   );
 }
 
-/** Renders the close icon. */
 function CloseIcon() {
   return (
     <svg
@@ -187,7 +185,6 @@ function CloseIcon() {
   );
 }
 
-/** Renders the sun icon. */
 function SunIcon() {
   return (
     <svg
@@ -203,7 +200,6 @@ function SunIcon() {
   );
 }
 
-/** Renders the moon icon. */
 function MoonIcon() {
   return (
     <svg
@@ -218,7 +214,6 @@ function MoonIcon() {
   );
 }
 
-/** Renders a feature icon. */
 function FeatureIcon({ type }) {
   const props = {
     viewBox: "0 0 24 24",
@@ -284,7 +279,6 @@ function FeatureIcon({ type }) {
   );
 }
 
-/** Renders an icon for a placement step. */
 function StepIcon({ type }) {
   const props = {
     viewBox: "0 0 24 24",
@@ -337,9 +331,8 @@ function StepIcon({ type }) {
   );
 }
 
-/* ---------------- NAVBAR ---------------- */
+/* ================= NAVBAR ================= */
 
-/** Renders the responsive navigation bar with theme switching. */
 function Navbar({ darkMode, setDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -357,9 +350,11 @@ function Navbar({ darkMode, setDarkMode }) {
             <p className="text-xs font-bold text-white">
               DKTE Society&apos;s
             </p>
+
             <p className="text-[10px] font-semibold text-white">
               Textile & Engineering Institute
             </p>
+
             <p className="text-[9px] text-slate-300">
               Ichalkaranji
             </p>
@@ -379,11 +374,13 @@ function Navbar({ darkMode, setDarkMode }) {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          {/* Theme switch */}
+          {/* THEME TOGGLE */}
           <button
             type="button"
             aria-label={
-              darkMode ? "Switch to light mode" : "Switch to dark mode"
+              darkMode
+                ? "Switch to light mode"
+                : "Switch to dark mode"
             }
             onClick={() => setDarkMode((current) => !current)}
             className="flex h-10 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-white transition hover:border-[#ffc52c] hover:text-[#ffc52c]"
@@ -403,19 +400,23 @@ function Navbar({ darkMode, setDarkMode }) {
             </span>
           </button>
 
+          {/* LOGIN */}
           <Link
-            to="/get-started"
-            className="inline-flex items-center gap-2 rounded-full bg-[#ffc52c] px-5 py-3 text-xs font-bold text-[#07152d] shadow-md transition hover:bg-[#ffd45c] hover:shadow-lg"
+            to="/login"
+            className="inline-flex items-center justify-center rounded-full border-2 border-white/70 px-5 py-3 text-xs font-bold text-white transition-all duration-300 hover:border-[#ffc52c] hover:bg-white hover:text-[#07152d]"
           >
-            Get Started
-            <ArrowIcon />
+            Login
           </Link>
         </div>
 
         <button
           type="button"
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          onClick={() => setMobileMenuOpen((current) => !current)}
+          aria-label={
+            mobileMenuOpen ? "Close menu" : "Open menu"
+          }
+          onClick={() =>
+            setMobileMenuOpen((current) => !current)
+          }
           className="rounded-lg border border-white/25 p-2 text-white hover:bg-white/10 lg:hidden"
         >
           {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -437,34 +438,34 @@ function Navbar({ darkMode, setDarkMode }) {
             ))}
           </nav>
 
-          <div className="mt-4 flex gap-3">
-            <button
-              type="button"
-              onClick={() => setDarkMode((current) => !current)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-xs font-semibold text-white"
-            >
-              {darkMode ? <MoonIcon /> : <SunIcon />}
-              {darkMode ? "Dark Mode" : "Light Mode"}
-            </button>
-
+          <div className="mt-4">
             <Link
-              to="/get-started"
+              to="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#ffc52c] px-4 py-3 text-xs font-bold text-[#07152d]"
+              className="flex w-full items-center justify-center rounded-full border-2 border-white/70 px-4 py-3 text-xs font-bold text-white transition hover:bg-white hover:text-[#07152d]"
             >
-              Get Started
-              <ArrowIcon />
+              Login
             </Link>
           </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setDarkMode((current) => !current)
+            }
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-xs font-semibold text-white"
+          >
+            {darkMode ? <MoonIcon /> : <SunIcon />}
+            {darkMode ? "Dark Mode" : "Light Mode"}
+          </button>
         </div>
       )}
     </header>
   );
 }
 
-/* ---------------- HERO ---------------- */
+/* ================= HERO ================= */
 
-/** Renders the hero section. */
 function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-[#07152d] pt-[78px]">
@@ -476,6 +477,7 @@ function HeroSection() {
         />
 
         <div className="absolute inset-0 bg-gradient-to-r from-[#07152d] via-[#07152d]/90 to-[#07152d]/30" />
+
         <div className="absolute inset-0 bg-gradient-to-t from-[#07152d] via-transparent to-[#07152d]/20" />
       </div>
 
@@ -494,20 +496,22 @@ function HeroSection() {
           </h1>
 
           <p className="mt-6 max-w-[580px] text-base leading-7 text-slate-200 sm:text-lg">
-            A unified platform to manage students, companies, placement
-            drives, eligibility and placement progress with ease and
-            efficiency.
+            A unified platform to manage students, companies,
+            placement drives, eligibility and placement progress
+            with ease and efficiency.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {/* LOGIN */}
             <Link
-              to="/get-started"
+              to="/login"
               className="inline-flex items-center justify-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition hover:-translate-y-1 hover:bg-[#ffd45c]"
             >
-              Get Started Now
+              Login
               <ArrowIcon />
             </Link>
 
+            {/* EXPLORE FEATURES */}
             <Link
               to="/features"
               className="inline-flex items-center justify-center gap-3 rounded-full border border-white/50 bg-white/5 px-7 py-4 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
@@ -528,8 +532,13 @@ function HeroSection() {
                 key={label}
                 className="border-white/10 sm:border-r sm:px-5 first:sm:pl-0 last:sm:border-r-0"
               >
-                <p className="text-xl font-bold text-[#ffc52c]">{value}</p>
-                <p className="mt-1 text-xs text-slate-300">{label}</p>
+                <p className="text-xl font-bold text-[#ffc52c]">
+                  {value}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-300">
+                  {label}
+                </p>
               </div>
             ))}
           </div>
@@ -547,6 +556,7 @@ function HeroSection() {
               <p className="text-[10px] font-semibold tracking-wider text-[#ffc52c] uppercase">
                 Upcoming Placement Drive
               </p>
+
               <p className="mt-1 text-xs text-white sm:text-sm">
                 TCS Digital Campus Drive on 25 May 2024
               </p>
@@ -566,35 +576,54 @@ function HeroSection() {
   );
 }
 
-/* ---------------- FEATURES ---------------- */
+/* ================= FEATURES ================= */
 
-/** Renders a single feature card. */
-function FeatureCard({ feature }) {
+function FeatureCard({ feature, darkMode }) {
   const isAnalytics = feature.type === "analytics";
 
   return (
-    <article className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <article
+      className={`group rounded-2xl border p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
+        darkMode
+          ? "border-slate-700 bg-[#111f3a]"
+          : "border-slate-200 bg-white"
+      }`}
+    >
       <div
         className={`flex h-12 w-12 items-center justify-center rounded-xl ${
           isAnalytics
             ? "bg-purple-100 text-purple-700"
-            : "bg-[#edf3fb] text-[#0b2854]"
+            : darkMode
+              ? "bg-[#1d355d] text-[#ffc52c]"
+              : "bg-[#edf3fb] text-[#0b2854]"
         }`}
       >
         <FeatureIcon type={feature.type} />
       </div>
 
-      <h3 className="mt-5 text-lg font-bold text-[#0b1f3a]">
+      <h3
+        className={`mt-5 text-lg font-bold ${
+          darkMode ? "text-white" : "text-[#0b1f3a]"
+        }`}
+      >
         {feature.title}
       </h3>
 
-      <p className="mt-3 text-sm leading-6 text-slate-500">
+      <p
+        className={`mt-3 text-sm leading-6 ${
+          darkMode ? "text-slate-300" : "text-slate-500"
+        }`}
+      >
         {feature.description}
       </p>
 
       <Link
         to="/features"
-        className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#0b2854] group-hover:text-[#a17b00]"
+        className={`mt-5 inline-flex items-center gap-2 text-xs font-bold ${
+          darkMode
+            ? "text-[#ffc52c]"
+            : "text-[#0b2854] group-hover:text-[#a17b00]"
+        }`}
       >
         Explore
         <ArrowIcon />
@@ -603,29 +632,46 @@ function FeatureCard({ feature }) {
   );
 }
 
-/** Renders the features section. */
-function FeaturesSection() {
+function FeaturesSection({ darkMode }) {
   return (
-    <section className="bg-[#f7f9fc] py-20">
+    <section
+      className={
+        darkMode
+          ? "bg-[#0b1f3a] py-20"
+          : "bg-[#f7f9fc] py-20"
+      }
+    >
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
             Powerful Modules
           </p>
 
-          <h2 className="mt-3 text-3xl font-bold text-[#0b1f3a] sm:text-4xl">
+          <h2
+            className={`mt-3 text-3xl font-bold sm:text-4xl ${
+              darkMode ? "text-white" : "text-[#0b1f3a]"
+            }`}
+          >
             Everything You Need in One Platform
           </h2>
 
-          <p className="mt-4 text-sm leading-6 text-slate-500">
-            A centralized system designed to simplify every stage of campus
-            placements.
+          <p
+            className={`mt-4 text-sm leading-6 ${
+              darkMode ? "text-slate-300" : "text-slate-500"
+            }`}
+          >
+            A centralized system designed to simplify every stage
+            of campus placements.
           </p>
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
+            <FeatureCard
+              key={feature.title}
+              feature={feature}
+              darkMode={darkMode}
+            />
           ))}
         </div>
       </div>
@@ -633,9 +679,8 @@ function FeaturesSection() {
   );
 }
 
-/* ---------------- HOW IT WORKS ---------------- */
+/* ================= HOW IT WORKS ================= */
 
-/** Renders one placement journey step. */
 function PlacementStep({ step }) {
   return (
     <div className="relative flex flex-1 flex-col items-center text-center">
@@ -647,7 +692,9 @@ function PlacementStep({ step }) {
         {step.number}
       </span>
 
-      <h3 className="mt-2 text-sm font-bold text-white">{step.title}</h3>
+      <h3 className="mt-2 text-sm font-bold text-white">
+        {step.title}
+      </h3>
 
       <p className="mt-2 max-w-[160px] text-xs leading-5 text-slate-300">
         {step.description}
@@ -656,7 +703,6 @@ function PlacementStep({ step }) {
   );
 }
 
-/** Renders the how-it-works section. */
 function HowItWorksSection() {
   return (
     <section className="bg-[#0b1f3a] py-20">
@@ -673,8 +719,8 @@ function HowItWorksSection() {
               </h2>
 
               <p className="mt-4 text-sm leading-6 text-slate-300">
-                A simple five-step journey from creating your profile to
-                achieving your placement goal.
+                A simple five-step journey from creating your profile
+                to achieving your placement goal.
               </p>
 
               <Link
@@ -688,7 +734,10 @@ function HowItWorksSection() {
 
             <div className="grid gap-10 sm:grid-cols-2 lg:flex lg:gap-0">
               {placementSteps.map((step) => (
-                <PlacementStep key={step.number} step={step} />
+                <PlacementStep
+                  key={step.number}
+                  step={step}
+                />
               ))}
             </div>
           </div>
@@ -698,15 +747,16 @@ function HowItWorksSection() {
   );
 }
 
-/* ---------------- ROLES ---------------- */
+/* ================= ROLES ================= */
 
-/** Returns the styling theme for a role. */
-function getRoleTheme(type) {
+function getRoleTheme(type, darkMode) {
   if (type === "student") {
     return {
-      card: "bg-[#fff8e5]",
-      title: "text-[#10284b]",
-      text: "text-slate-600",
+      card: darkMode ? "bg-[#17274b]" : "bg-[#fff8e5]",
+      title: "text-white",
+      text: darkMode
+        ? "text-slate-300"
+        : "text-slate-600",
       button: "bg-[#ffc52c] text-[#07152d]",
     };
   }
@@ -719,13 +769,12 @@ function getRoleTheme(type) {
   };
 }
 
-/** Renders a role card. */
-function RoleCard({ role }) {
-  const theme = getRoleTheme(role.type);
+function RoleCard({ role, darkMode }) {
+  const theme = getRoleTheme(role.type, darkMode);
 
   return (
     <article
-      className={`overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
+      className={`overflow-hidden rounded-2xl border border-slate-200/20 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
     >
       <div className="grid min-h-[300px] grid-cols-[40%_60%]">
         <div className="overflow-hidden">
@@ -737,15 +786,19 @@ function RoleCard({ role }) {
         </div>
 
         <div className="flex flex-col p-5">
-          <span className="text-[10px] font-bold tracking-widest uppercase opacity-70">
+          <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase">
             Placement Role
           </span>
 
-          <h3 className={`mt-2 text-xl font-bold ${theme.title}`}>
+          <h3
+            className={`mt-2 text-xl font-bold ${theme.title}`}
+          >
             {role.title}
           </h3>
 
-          <p className={`mt-2 text-xs leading-5 ${theme.text}`}>
+          <p
+            className={`mt-2 text-xs leading-5 ${theme.text}`}
+          >
             {role.description}
           </p>
 
@@ -773,24 +826,37 @@ function RoleCard({ role }) {
   );
 }
 
-/** Renders the roles section. */
-function RolesSection() {
+function RolesSection({ darkMode }) {
   return (
-    <section className="bg-white py-20">
+    <section
+      className={
+        darkMode
+          ? "bg-[#07152d] py-20"
+          : "bg-white py-20"
+      }
+    >
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
         <div>
-          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
             One Platform. Three Roles.
           </p>
 
-          <h2 className="mt-3 text-3xl font-bold text-[#0b1f3a] sm:text-4xl">
+          <h2
+            className={`mt-3 text-3xl font-bold sm:text-4xl ${
+              darkMode ? "text-white" : "text-[#0b1f3a]"
+            }`}
+          >
             Built for Students, TPOs and Admins
           </h2>
         </div>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-3">
           {roles.map((role) => (
-            <RoleCard key={role.title} role={role} />
+            <RoleCard
+              key={role.title}
+              role={role}
+              darkMode={darkMode}
+            />
           ))}
         </div>
       </div>
@@ -798,16 +864,18 @@ function RolesSection() {
   );
 }
 
-/* ---------------- STATISTICS ---------------- */
+/* ================= STATISTICS ================= */
 
-/** Renders the statistics section. */
 function StatisticsSection() {
   return (
     <section className="bg-[#07152d] py-10">
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {statistics.map(([value, label]) => (
-            <div key={label} className="px-4 py-4 text-center">
+            <div
+              key={label}
+              className="px-4 py-4 text-center"
+            >
               <p className="text-2xl font-bold text-[#ffc52c] sm:text-3xl">
                 {value}
               </p>
@@ -823,26 +891,41 @@ function StatisticsSection() {
   );
 }
 
-/* ---------------- ABOUT ---------------- */
+/* ================= ABOUT ================= */
 
-/** Renders the about section. */
-function AboutSection() {
+function AboutSection({ darkMode }) {
   return (
-    <section className="bg-[#f7f9fc] py-20">
+    <section
+      className={
+        darkMode
+          ? "bg-[#0b1f3a] py-20"
+          : "bg-[#f7f9fc] py-20"
+      }
+    >
       <div className="mx-auto grid max-w-[1240px] gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center lg:px-10">
         <div>
-          <p className="text-[11px] font-bold tracking-[0.25em] text-[#a17b00] uppercase">
+          <p className="text-[11px] font-bold tracking-[0.25em] text-[#ffc52c] uppercase">
             About Us
           </p>
 
-          <h2 className="mt-3 text-3xl font-bold text-[#0b1f3a] sm:text-4xl">
+          <h2
+            className={`mt-3 text-3xl font-bold sm:text-4xl ${
+              darkMode ? "text-white" : "text-[#0b1f3a]"
+            }`}
+          >
             Simplifying the Placement Journey
           </h2>
 
-          <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
-            The DKTE Placement Management System brings students, placement
-            activities, companies and administrators together on one
-            organized platform.
+          <p
+            className={`mt-5 max-w-xl text-sm leading-7 ${
+              darkMode
+                ? "text-slate-300"
+                : "text-slate-600"
+            }`}
+          >
+            The DKTE Placement Management System brings students,
+            placement activities, companies and administrators
+            together on one organized platform.
           </p>
 
           <Link
@@ -874,20 +957,27 @@ function AboutSection() {
                   key={label}
                   className="rounded-xl bg-white/10 p-3 text-center"
                 >
-                  <p className="text-lg font-bold text-[#ffc52c]">{value}</p>
-                  <p className="mt-1 text-[8px] text-slate-300">{label}</p>
+                  <p className="text-lg font-bold text-[#ffc52c]">
+                    {value}
+                  </p>
+
+                  <p className="mt-1 text-[8px] text-slate-300">
+                    {label}
+                  </p>
                 </div>
               ))}
             </div>
 
             <div className="mt-5 flex h-28 items-end gap-2 rounded-xl bg-white/5 p-4">
-              {[35, 48, 42, 65, 58, 78, 70, 90].map((height, index) => (
-                <div
-                  key={index}
-                  className="flex-1 rounded-t bg-[#ffc52c]"
-                  style={{ height: `${height}px` }}
-                />
-              ))}
+              {[35, 48, 42, 65, 58, 78, 70, 90].map(
+                (height, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 rounded-t bg-[#ffc52c]"
+                    style={{ height: `${height}px` }}
+                  />
+                )
+              )}
             </div>
           </div>
         </div>
@@ -896,32 +986,31 @@ function AboutSection() {
   );
 }
 
-/* ---------------- CTA ---------------- */
+/* ================= FINAL CTA ================= */
 
-/** Renders the final call-to-action section. */
 function FinalCTA() {
   return (
     <section className="bg-[#211653]">
       <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-8 px-5 py-12 sm:px-8 md:flex-row md:items-center lg:px-10">
         <div>
           <p className="text-[10px] font-bold tracking-[0.2em] text-[#ffc52c] uppercase">
-            Your Next Chapter Starts Here
+            Welcome to the Placement Portal
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-            Ready to Simplify Placements?
+            Ready to Access Your Placement Portal?
           </h2>
 
           <p className="mt-2 text-sm text-slate-300">
-            Take the first step towards a smarter placement process.
+            Login to continue with your placement journey.
           </p>
         </div>
 
         <Link
-          to="/get-started"
+          to="/login"
           className="inline-flex items-center gap-3 rounded-full bg-[#ffc52c] px-7 py-4 text-sm font-bold text-[#07152d] transition hover:bg-[#ffd45c]"
         >
-          Get Started Now
+          Login
           <ArrowIcon />
         </Link>
       </div>
@@ -929,9 +1018,8 @@ function FinalCTA() {
   );
 }
 
-/* ---------------- FOOTER ---------------- */
+/* ================= FOOTER ================= */
 
-/** Renders the site footer. */
 function Footer() {
   return (
     <footer className="bg-[#07152d] text-white">
@@ -944,7 +1032,9 @@ function Footer() {
               className="h-10 w-auto"
             />
 
-            <p className="mt-4 text-xs font-bold">DKTE Society&apos;s</p>
+            <p className="mt-4 text-xs font-bold">
+              DKTE Society&apos;s
+            </p>
 
             <p className="mt-1 text-xs text-slate-300">
               Textile & Engineering Institute, Ichalkaranji
@@ -952,7 +1042,9 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold">Quick Links</h3>
+            <h3 className="text-sm font-bold">
+              Quick Links
+            </h3>
 
             <ul className="mt-4 space-y-2">
               {navigationLinks.map((link) => (
@@ -969,7 +1061,9 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold">Features</h3>
+            <h3 className="text-sm font-bold">
+              Features
+            </h3>
 
             <ul className="mt-4 space-y-2">
               {features.map((feature) => (
@@ -986,7 +1080,9 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold">Support</h3>
+            <h3 className="text-sm font-bold">
+              Support
+            </h3>
 
             <ul className="mt-4 space-y-2">
               {[
@@ -1011,8 +1107,8 @@ function Footer() {
 
         <div className="mt-10 border-t border-white/10 pt-6 text-center">
           <p className="text-[10px] text-slate-500">
-            © 2024 DKTE Society&apos;s Textile & Engineering Institute. All
-            rights reserved.
+            © 2024 DKTE Society&apos;s Textile & Engineering
+            Institute. All rights reserved.
           </p>
         </div>
       </div>
@@ -1020,24 +1116,39 @@ function Footer() {
   );
 }
 
-/* ---------------- MAIN PAGE ---------------- */
+/* ================= MAIN PAGE ================= */
 
-/** Renders the complete landing page and controls its theme. */
 function LandingPage() {
   const [darkMode, setDarkMode] = useState(false);
 
   return (
     <div className={darkMode ? "dark" : ""}>
-      <div className="min-h-screen bg-white text-[#0b1f3a] transition-colors duration-300 dark:bg-[#07152d] dark:text-white">
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div
+        className={`min-h-screen transition-colors duration-300 ${
+          darkMode
+            ? "bg-[#07152d] text-white"
+            : "bg-white text-[#0b1f3a]"
+        }`}
+      >
+        <Navbar
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
 
         <HeroSection />
-        <FeaturesSection />
+
+        <FeaturesSection darkMode={darkMode} />
+
         <HowItWorksSection />
-        <RolesSection />
+
+        <RolesSection darkMode={darkMode} />
+
         <StatisticsSection />
-        <AboutSection />
+
+        <AboutSection darkMode={darkMode} />
+
         <FinalCTA />
+
         <Footer />
       </div>
     </div>
