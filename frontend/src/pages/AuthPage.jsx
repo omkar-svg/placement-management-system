@@ -14,6 +14,14 @@ export default function AuthPage() {
   const [status, setStatus] = useState({ error: '', success: '', loading: false });
 
   useEffect(() => {
+    const token = authService.getToken();
+    if (token) {
+      const user = authService.getUser();
+      navigate(user?.role === 'STUDENT' ? '/student/dashboard' : '/', { replace: true });
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     setIsLogin(location.pathname !== '/register');
     setStatus({ error: '', success: '', loading: false });
   }, [location.pathname]);
@@ -34,6 +42,11 @@ export default function AuthPage() {
 
     if (!cleanEmail || !password) {
       return setStatus({ error: 'Please enter all required fields.', success: '', loading: false });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return setStatus({ error: 'Please enter a valid email address.', success: '', loading: false });
     }
 
     if (!isLogin) {
