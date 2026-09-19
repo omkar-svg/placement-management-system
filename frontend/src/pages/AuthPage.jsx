@@ -47,8 +47,13 @@ export default function AuthPage() {
         setStatus({ error: res?.message || 'Invalid credentials.', success: '', loading: false });
       }
     } catch (err) {
+      const errorMessage =
+        err.response?.data?.message ||
+        (err.code === 'ERR_NETWORK' || !err.response
+          ? 'Unable to connect to the backend server. Please ensure the backend is running on port 5000.'
+          : 'Invalid email or password.');
       setStatus({
-        error: err.response?.data?.message || 'Invalid email or password.',
+        error: errorMessage,
         success: '',
         loading: false,
       });
