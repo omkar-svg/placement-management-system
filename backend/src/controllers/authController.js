@@ -1,7 +1,7 @@
 // Auth Controller - To be implemented
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const prisma = require("../prisma");
+const prisma = require("../prismaClient");
 
 // -------- register ----------
 const register = async (req, res) => {
@@ -23,7 +23,7 @@ const register = async (req, res) => {
 
         if (existingUser) {
             return res.status(409).json({
-                success: message,
+                success: false,
                 message: "Email already registered"
             });
         }
