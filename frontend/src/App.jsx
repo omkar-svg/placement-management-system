@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
 import MainDashboardPage from './pages/MainDashboardPage.jsx';
 import TpoAccountsPage from './pages/TpoAccountsPage.jsx';
@@ -7,36 +8,57 @@ import SystemSettingsPage from './pages/SystemSettingsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import AuditLogsPage from './pages/AuditLogsPage.jsx';
 
-// ============================================================
-// APP ROUTES
-// This file is shared by the whole team. When you add a new page,
-// add ONE <Route> line here — don't touch anyone else's route.
-// ============================================================
+import LandingPage from './pages/LandingPage.jsx';
+import StudentDashboard from './pages/StudentDashboard.jsx';
+
 function App() {
   return (
     <Routes>
-      {/* Default route — sends people straight to the admin dashboard */}
-      <Route path="/" element={<Navigate to="/admin-dashboard" replace />} />
+      {/* Landing page */}
+      <Route path="/" element={<LandingPage />} />
 
-      {/* ✅ My page */}
-      <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+      {/* Admin routes */}
+      <Route
+        path="/admin-dashboard"
+        element={<AdminDashboardPage />}
+      />
 
-      {/* ✅ Main Dashboard — built out with its own service/components,
-          starting from empty/zero states until the real backend endpoint
-          exists (see services/mainDashboardService.js). */}
-      <Route path="/main-dashboard" element={<MainDashboardPage />} />
+      <Route
+        path="/main-dashboard"
+        element={<MainDashboardPage />}
+      />
 
-      {/* ✅ TPO Accounts, System Settings, Reports, Audit Logs — all built
-          out the same way: own page, own components/<feature>/ folder,
-          own services/<feature>Service.js, starting from empty/zero
-          states rather than any hard-coded data. */}
-      <Route path="/tpo-accounts" element={<TpoAccountsPage />} />
-      <Route path="/system-settings" element={<SystemSettingsPage />} />
-      <Route path="/reports" element={<ReportsPage />} />
-      <Route path="/audit-logs" element={<AuditLogsPage />} />
+      <Route
+        path="/tpo-accounts"
+        element={<TpoAccountsPage />}
+      />
 
-      {/* Catch-all for unknown URLs */}
-      <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
+      <Route
+        path="/system-settings"
+        element={<SystemSettingsPage />}
+      />
+
+      <Route
+        path="/reports"
+        element={<ReportsPage />}
+      />
+
+      <Route
+        path="/audit-logs"
+        element={<AuditLogsPage />}
+      />
+
+      {/* Student routes */}
+      <Route
+        path="/student/dashboard"
+        element={<StudentDashboard />}
+      />
+
+      {/* Unknown URLs */}
+      <Route
+        path="*"
+        element={<Navigate to="/" replace />}
+      />
     </Routes>
   );
 }
