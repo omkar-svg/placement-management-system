@@ -1,36 +1,73 @@
-import React, { createContext, useContext, useState } from 'react';
-
-// Current logged-in user shown across the app (sidebar profile card,
-// header greeting). Once a real login endpoint exists, replace this
-// with the response from that call.
-const DEFAULT_USER = {
-  name: 'Shivam Torvi',
-  role: 'Global Admin',
-};
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import authService from '../services/authService.js';
 
 const AuthContext = createContext(null);
 
-// Wrap the app in this once (see main.jsx). Any component can then call
-// useAuth() to read the current user or trigger login/logout, instead of
-// every page having to fetch/hold that state itself.
+// Exposes the real logged-in user to the whole app.
+//
+// Login itself is done by the Main frontend's AuthPage through
+// authService, which keeps the JWT and user in localStorage (`token` /
+// `user`). This provider reads that same storage, so there is a single
+// source of truth. It re-reads on every route change, which is how it
+// picks up a login/logout that happened on another page.
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(DEFAULT_USER);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const navigate = useNavigate();
+  const [, forceRefresh] = useState(0);
 
-  // Placeholder for a real login call. Swap the body for an Axios POST to
-  // your auth service (e.g. via services/api.js) once that endpoint exists.
-  const login = (userData) => {
-    setUser(userData ?? DEFAULT_USER);
-    setIsAuthenticated(true);
+  // Subscribing to the router re-renders this provider on every
+  // navigation, so the storage read below is always fresh after AuthPage
+  // stores a new session and navigates away.
+  useLocation();
+  const token = authService.getToken();
+  const user = authService.getUser();
+
+  // Once per page load, confirm the session with GET /auth/me so the
+  // name/role shown come from the server rather than only from storage.
+  useEffect(() => {
+    if (!authService.getToken()) return undefined;
+    let cancelled = false;
+
+    authService
+      .getCurrentUser()
+      .then((res) => {
+        if (cancelled || !res?.success || !res.data) return;
+        localStorage.setItem('user', JSON.stringify(res.data));
+        forceRefresh((n) => n + 1);
+      })
+      .catch((error) => {
+        // Expired/invalid token: clear it so ProtectedRoute sends the
+        // person to /login.
+        if (!cancelled && error.response?.status === 401) {
+          authService.logout();
+          forceRefresh((n) => n + 1);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const login = async (credentials) => {
+    const res = await authService.login(credentials);
+    forceRefresh((n) => n + 1);
+    return res;
   };
 
-  // Signs the current user out. Clears local auth state; wire up a token
-  // removal / API call here when real auth is added.
   const logout = () => {
-    setIsAuthenticated(false);
+    authService.logout();
+    forceRefresh((n) => n + 1);
+    navigate('/login', { replace: true });
   };
 
-  const value = { user, isAuthenticated, login, logout };
+  const value = {
+    user,
+    role: user?.role ?? null,
+    isAuthenticated: Boolean(token && user),
+    login,
+    logout,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

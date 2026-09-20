@@ -50,3 +50,28 @@
     grid-template-columns: 1fr;
   }
 }
+
+.system-settings-page__notice {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--color-gold-100);
+  border: 1px solid var(--color-gold-400);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 13px;
+}
+
+/* <fieldset disabled> greys the whole form out; strip its default box. */
+.system-settings-page__fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.system-settings-page__save-btn:disabled,
+.system-settings-page__save-btn:disabled:hover {
+  background: var(--color-gold-500);
+  opacity: 0.55;
+  cursor: not-allowed;
+}

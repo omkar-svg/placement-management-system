@@ -2,7 +2,7 @@ import React from 'react';
 import { FaPlus } from 'react-icons/fa';
 import './ReportsToolbar.css';
 
-function ReportsToolbar({ typeFilter, onTypeFilterChange, onGenerateReport, isGenerating }) {
+function ReportsToolbar({ typeFilter, onTypeFilterChange, onGenerateReport, isGenerating, generateDisabledReason }) {
   return (
     <div className="reports-toolbar">
       <select
@@ -16,7 +16,13 @@ function ReportsToolbar({ typeFilter, onTypeFilterChange, onGenerateReport, isGe
         <option value="audit">Audit</option>
       </select>
 
-      <button type="button" className="reports-toolbar__generate-btn" onClick={onGenerateReport} disabled={isGenerating}>
+      <button
+        type="button"
+        className="reports-toolbar__generate-btn"
+        onClick={onGenerateReport}
+        disabled={!onGenerateReport || isGenerating}
+        title={!onGenerateReport ? generateDisabledReason : undefined}
+      >
         <FaPlus aria-hidden="true" /> {isGenerating ? 'Generating…' : 'Generate Report'}
       </button>
     </div>

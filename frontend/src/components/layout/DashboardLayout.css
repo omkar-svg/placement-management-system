@@ -17,3 +17,52 @@
     flex-direction: column;
   }
 }
+
+/* ------------------------------------------------------------
+   Admin look, scoped to the admin shell only.
+   The Main frontend's global styles (index.css) use a white body,
+   Inter font and a gold focus ring. The admin pages keep their own
+   look by applying it on .app-shell instead of on <body>, so
+   nothing here leaks into the Landing / Login / Student pages.
+   ------------------------------------------------------------ */
+.app-shell {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  /* Tailwind's preflight sets line-height: 1.5 on <html>; the admin CSS was
+     designed against the browser default ("normal"), so keep that here. */
+  line-height: normal;
+}
+
+.app-shell button:focus-visible,
+.app-shell a:focus-visible,
+.app-shell [tabindex]:focus-visible {
+  outline: 2px solid var(--color-purple);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   Tailwind preflight compatibility.
+   Tailwind (needed by the Main pages) resets heading sizes/weights
+   and paragraph margins. The admin CSS was written against plain
+   browser defaults, so restore those defaults here. :where() keeps
+   specificity at zero, so any real admin rule always wins.
+   ------------------------------------------------------------ */
+:where(.app-shell) :where(h1, h2, h3) { font-weight: 700; }
+:where(.app-shell) :where(h1) { font-size: 2em; margin-block: 0.67em; }
+:where(.app-shell) :where(h2) { font-size: 1.5em; margin-block: 0.83em; }
+:where(.app-shell) :where(h3) { font-size: 1.17em; margin-block: 1em; }
+:where(.app-shell) :where(p) { margin-block: 1em; }
+/* Form controls: preflight zeroes their padding/background/colour/radius and
+   forces font: inherit. Restore the browser defaults for anything the admin
+   CSS doesn't style itself. */
+:where(.app-shell) :where(input, select, textarea, button) {
+  padding: revert;
+  background-color: revert;
+  color: revert;
+  border-radius: revert;
+}
+:where(.app-shell) :where(input, select, textarea) {
+  font: revert;
+  letter-spacing: revert;
+}

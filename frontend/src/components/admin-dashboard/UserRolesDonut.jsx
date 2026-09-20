@@ -1,11 +1,28 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { FaChartPie } from 'react-icons/fa';
+import EmptyState from '../common/EmptyState.jsx';
 import './UserRolesDonut.css';
 
-function UserRolesDonut({ total, totalLabel, roles }) {
+// Donut + legend. Used for the placement-status breakdown; `roles` is just
+// a list of { key, name, count, percent, color } slices.
+function UserRolesDonut({ title = 'Distribution', total, totalLabel, roles }) {
+  if (!roles || roles.length === 0) {
+    return (
+      <section className="roles-donut">
+        <h2>{title}</h2>
+        <EmptyState
+          icon={FaChartPie}
+          title="No placement records yet"
+          description="The status breakdown appears once students have placement records."
+        />
+      </section>
+    );
+  }
+
   return (
     <section className="roles-donut">
-      <h2>User Roles Distribution</h2>
+      <h2>{title}</h2>
 
       <div className="roles-donut__body">
         <div className="roles-donut__chart">

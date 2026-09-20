@@ -4,26 +4,34 @@ import DrivesSummary from '../components/main-dashboard/DrivesSummary.jsx';
 import ApplicationsTrend from '../components/main-dashboard/ApplicationsTrend.jsx';
 import UpcomingDrives from '../components/main-dashboard/UpcomingDrives.jsx';
 import RecentActivity from '../components/main-dashboard/RecentActivity.jsx';
+import ErrorNotice from '../components/common/ErrorNotice.jsx';
 import { getMainDashboardOverview } from '../services/mainDashboardService.js';
+import { getErrorMessage } from '../services/api.js';
 import './MainDashboardPage.css';
 
 // Main Dashboard page. Fetches all its data through the service layer
-// (mainDashboardService.js) on mount, same pattern as AdminDashboardPage.
-// There is no original design/mock data for this page, so every number
-// starts at 0 and every list starts empty until the real backend endpoint
-// is wired up — see the comments in mainDashboardService.js.
+// (mainDashboardService.js, which reads the real backend) on mount, same
+// pattern as AdminDashboardPage. Numbers are 0 and lists are empty only
+// when the backend genuinely has no records.
 function MainDashboardPage() {
   const [dashboard, setDashboard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadDashboard() {
-      const data = await getMainDashboardOverview();
-      if (isMounted) {
-        setDashboard(data);
-        setIsLoading(false);
+      setIsLoading(true);
+      setError('');
+      try {
+        const data = await getMainDashboardOverview();
+        if (isMounted) setDashboard(data);
+      } catch (err) {
+        if (isMounted) setError(getErrorMessage(err, 'Failed to load the dashboard.'));
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     }
 
@@ -31,12 +39,20 @@ function MainDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [reloadKey]);
 
-  if (isLoading || !dashboard) {
+  if (isLoading) {
     return (
       <DashboardLayout>
         <p className="main-dashboard-page__loading">Loading dashboard…</p>
+      </DashboardLayout>
+    );
+  }
+
+  if (error || !dashboard) {
+    return (
+      <DashboardLayout>
+        <ErrorNotice message={error || 'Failed to load the dashboard.'} onRetry={() => setReloadKey((k) => k + 1)} />
       </DashboardLayout>
     );
   }

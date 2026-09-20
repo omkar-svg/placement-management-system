@@ -5,9 +5,9 @@ import AuditLogsTable from '../components/audit-logs/AuditLogsTable.jsx';
 import { getAuditLogs } from '../services/auditLogsService.js';
 import './AuditLogsPage.css';
 
-// Audit Logs page. Fetches through auditLogsService.js on mount — starts
-// as an empty list (see the data policy comment in that service) until
-// real log entries exist. Fully wired up to search/filter once they do.
+// Audit Logs page. Loads through auditLogsService.js on mount. The backend
+// has no audit-log endpoint yet (see that service), so the list is empty.
+// Search/filter are ready for when real entries exist.
 function AuditLogsPage() {
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -13,7 +13,7 @@ function ApplicationsTrend({ data }) {
   return (
     <section className="applications-trend">
       <div className="applications-trend__header">
-        <h2>Applications Trend</h2>
+        <h2>Placement Records Trend</h2>
       </div>
 
       {hasData ? (
@@ -24,15 +24,15 @@ function ApplicationsTrend({ data }) {
               <XAxis dataKey="month" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
               <Tooltip />
-              <Bar dataKey="applications" fill="var(--color-navy-900)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="records" name="Records" fill="var(--color-navy-900)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       ) : (
         <EmptyState
           icon={FaChartBar}
-          title="No application data yet"
-          description="Once drives start receiving applications, the monthly trend will appear here."
+          title="No placement records yet"
+          description="Once students have placement records, the monthly trend will appear here."
         />
       )}
     </section>

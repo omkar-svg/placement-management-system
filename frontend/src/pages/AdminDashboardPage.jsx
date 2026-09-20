@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import DashboardHeader from '../components/admin-dashboard/DashboardHeader.jsx';
@@ -10,25 +9,33 @@ import UserRolesDonut from '../components/admin-dashboard/UserRolesDonut.jsx';
 import ServerStatus from '../components/admin-dashboard/ServerStatus.jsx';
 import LatestLogs from '../components/admin-dashboard/LatestLogs.jsx';
 import PromoBanner from '../components/admin-dashboard/PromoBanner.jsx';
+import ErrorNotice from '../components/common/ErrorNotice.jsx';
 import { getAdminDashboardOverview } from '../services/adminDashboardService.js';
+import { getErrorMessage } from '../services/api.js';
 import './AdminDashboardPage.css';
 
 // Campus Admin Dashboard page. Fetches all its data through the service
-// layer (adminDashboardService.js) on mount, so components stay "dumb"
-// and only render whatever data they're given as props.
+// layer (adminDashboardService.js, which reads the real backend) on mount,
+// so components stay "dumb" and only render whatever data they're given.
 function AdminDashboardPage() {
   const [dashboard, setDashboard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadDashboard() {
-      const data = await getAdminDashboardOverview();
-      if (isMounted) {
-        setDashboard(data);
-        setIsLoading(false);
+      setIsLoading(true);
+      setError('');
+      try {
+        const data = await getAdminDashboardOverview();
+        if (isMounted) setDashboard(data);
+      } catch (err) {
+        if (isMounted) setError(getErrorMessage(err, 'Failed to load the dashboard.'));
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     }
 
@@ -36,12 +43,20 @@ function AdminDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [reloadKey]);
 
-  if (isLoading || !dashboard) {
+  if (isLoading) {
     return (
       <DashboardLayout>
         <p className="admin-dashboard-page__loading">Loading dashboard…</p>
+      </DashboardLayout>
+    );
+  }
+
+  if (error || !dashboard) {
+    return (
+      <DashboardLayout>
+        <ErrorNotice message={error || 'Failed to load the dashboard.'} onRetry={() => setReloadKey((k) => k + 1)} />
       </DashboardLayout>
     );
   }
@@ -54,7 +69,7 @@ function AdminDashboardPage() {
         messageCount={dashboard.messageCount}
       />
 
-      <StatCards cards={dashboard.statCards} onViewSecurityDetails={() => navigate('/audit-logs')} />
+      <StatCards cards={dashboard.statCards} />
 
       <div className="admin-dashboard-page__grid admin-dashboard-page__grid--top">
         <ActivityChart
@@ -67,12 +82,13 @@ function AdminDashboardPage() {
 
       <div className="admin-dashboard-page__grid admin-dashboard-page__grid--bottom">
         <UserRolesDonut
-          total={dashboard.userRolesDistribution.total}
-          totalLabel={dashboard.userRolesDistribution.totalLabel}
-          roles={dashboard.userRolesDistribution.roles}
+          title={dashboard.statusDistribution.title}
+          total={dashboard.statusDistribution.total}
+          totalLabel={dashboard.statusDistribution.totalLabel}
+          roles={dashboard.statusDistribution.roles}
         />
         <ServerStatus metrics={dashboard.serverStatus} />
-        <LatestLogs logs={dashboard.latestLogs} />
+        <LatestLogs logs={dashboard.latestNotifications} />
       </div>
 
       <PromoBanner heading={dashboard.promoBanner.heading} subheading={dashboard.promoBanner.subheading} />

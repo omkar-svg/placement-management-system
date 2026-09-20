@@ -1,20 +1,15 @@
-import api from './api.js';
-
-// The admin dashboard's "Latest System Logs" only shows a *preview* of
-// 3 entries copied from the original design, and that data stays owned
-// by adminDashboardService.js (DEFAULT_DASHBOARD_DATA.latestLogs) —
-// untouched here. The full Audit Logs page has no such design to copy
-// from, so its fallback is a genuine empty list.
-const EMPTY_AUDIT_LOGS = [];
+// ============================================================
+// AUDIT LOGS — not supported by the backend yet
+//
+// There is no audit-log model or endpoint. Needed on the backend:
+//   GET /api/audit-logs
+//
+// Until then this resolves to an empty list WITHOUT calling the network.
+// (The admin dashboard's "Latest Notifications" panel is separate: it
+// shows the real notifications from GET /api/notifications.)
+// ============================================================
+export const AUDIT_LOGS_SUPPORTED = false;
 
 export async function getAuditLogs() {
-  try {
-    const { data } = await api.get('/audit-logs');
-    return data;
-  } catch (error) {
-    console.warn('[auditLogsService] Falling back to empty log list — API call failed:', error.message);
-    return EMPTY_AUDIT_LOGS;
-  }
+  return [];
 }
-
-export { EMPTY_AUDIT_LOGS };

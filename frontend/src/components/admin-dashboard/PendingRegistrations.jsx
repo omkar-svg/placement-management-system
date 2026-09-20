@@ -1,61 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { FaUserClock } from 'react-icons/fa';
 import Avatar from '../common/Avatar.jsx';
-import { decideRegistration } from '../../services/adminDashboardService.js';
+import EmptyState from '../common/EmptyState.jsx';
 import './PendingRegistrations.css';
 
-// `registrations` comes from the page (fetched via adminDashboardService).
-function PendingRegistrations({ registrations: initialRegistrations }) {
-  const [registrations, setRegistrations] = useState(
-    initialRegistrations.map((reg) => ({ ...reg, status: 'pending' }))
-  );
-  const [showAllDrives, setShowAllDrives] = useState(false);
-
-  // Approves/rejects a registration: updates local state immediately,
-  // and calls the service so the backend can persist the decision.
-  const handleDecision = async (id, decision) => {
-    setRegistrations((current) =>
-      current.map((reg) => (reg.id === id ? { ...reg, status: decision } : reg))
-    );
-    await decideRegistration(id, decision);
-  };
-
+// `registrations` comes from the page (adminDashboardService).
+//
+// The backend creates an account immediately on POST /auth/register, so
+// there is no "pending" state and no approve/reject endpoint. The list is
+// therefore empty today; it is kept so the panel can show entries the day
+// such an endpoint exists (Approve / Reject buttons should be added with it).
+function PendingRegistrations({ registrations = [] }) {
   return (
     <section className="pending-reg">
       <h2>Pending TPO Registrations</h2>
 
-      <div className="pending-reg__list">
-        {registrations.map((reg) => (
-          <div className="pending-reg__item" key={reg.id}>
-            <Avatar name={reg.name.replace(/^New\s+/, '')} size={44} />
-            <div className="pending-reg__info">
-              <p className="pending-reg__name">{reg.name}</p>
-              <p className="pending-reg__desc">{reg.description}</p>
-            </div>
-
-            {reg.status === 'pending' ? (
-              <div className="pending-reg__actions">
-                <button type="button" className="pending-reg__btn" onClick={() => handleDecision(reg.id, 'approved')}>
-                  Approve
-                </button>
-                <span className="pending-reg__divider">/</span>
-                <button type="button" className="pending-reg__btn" onClick={() => handleDecision(reg.id, 'rejected')}>
-                  Reject
-                </button>
+      {registrations.length > 0 ? (
+        <div className="pending-reg__list">
+          {registrations.map((reg) => (
+            <div className="pending-reg__item" key={reg.id}>
+              <Avatar name={reg.name} size={44} />
+              <div className="pending-reg__info">
+                <p className="pending-reg__name">{reg.name}</p>
+                <p className="pending-reg__desc">{reg.description}</p>
               </div>
-            ) : (
-              <span className={`pending-reg__status pending-reg__status--${reg.status}`}>
-                {reg.status === 'approved' ? 'Approved' : 'Rejected'}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <button type="button" className="pending-reg__view-all" onClick={() => setShowAllDrives((open) => !open)}>
-        View All Drives →
-      </button>
-      {showAllDrives && (
-        <p className="pending-reg__empty-note">No additional drive records are available.</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={FaUserClock}
+          title="No pending registrations"
+          description="Accounts are created immediately on registration, so nothing waits for approval."
+        />
       )}
     </section>
   );

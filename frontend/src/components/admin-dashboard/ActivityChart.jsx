@@ -12,7 +12,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import './ActivityChart.css';
 
 // `legend`, `data`, and `periodOptions` all come from adminDashboardService
-// via the page — this component only knows how to render them.
+// via the page — one <Bar> is drawn per legend entry (matched by `key`).
 function ActivityChart({ legend, data, periodOptions }) {
   const [period, setPeriod] = useState(periodOptions[0]);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,7 +25,7 @@ function ActivityChart({ legend, data, periodOptions }) {
   return (
     <section className="activity-chart">
       <div className="activity-chart__header">
-        <h2>System Activity Monitor</h2>
+        <h2>Placement Activity</h2>
 
         <div className="activity-chart__period">
           <button
@@ -75,13 +75,18 @@ function ActivityChart({ legend, data, periodOptions }) {
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#9aa1b3', fontSize: 12 }}
-              domain={[0, 1200]}
-              ticks={[0, 200, 400, 600, 800, 1000, 1200]}
+              allowDecimals={false}
             />
             <Tooltip cursor={{ fill: 'rgba(16,25,58,0.04)' }} />
-            <Bar dataKey="saturated" fill="var(--color-chart-dark)" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="medium" fill="var(--color-chart-mid)" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="light" fill="var(--color-chart-light)" radius={[4, 4, 0, 0]} />
+            {legend.map((series) => (
+              <Bar
+                key={series.key}
+                dataKey={series.key}
+                name={series.name}
+                fill={series.color}
+                radius={[4, 4, 0, 0]}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -1,38 +1,78 @@
-import api from './api.js';
+import { getPlacements, getCompanies } from './placementsService.js';
+import { formatDate, humanize, lastMonths, monthKey } from '../utils/format.js';
 
 // ============================================================
-// MAIN DASHBOARD — data policy
-// Unlike adminDashboardService.js, there is no original design/mock
-// data for this page to copy values from. So the fallback below is a
-// genuine EMPTY/ZERO state (counts at 0, empty lists) — not invented
-// numbers or names. Once the real backend endpoint exists, its response
-// drives the UI and this fallback is only ever seen if that call fails.
+// MAIN DASHBOARD — built from the real backend
+//
+//   GET /api/placements  -> every student's status per drive (+ the drive)
+//   GET /api/companies   -> company names (drives only carry companyId)
+//
+// The backend has no "list drives" endpoint yet (routes/driveRoutes.js is
+// empty), so drives are discovered through placement records. A drive
+// with no student placement rows yet will not appear here until
+// GET /api/drives exists.
 // ============================================================
-const EMPTY_MAIN_DASHBOARD_DATA = {
-  summary: [
-    { id: 'active-drives', label: 'Active Drives', value: 0 },
-    { id: 'total-applications', label: 'Total Applications', value: 0 },
-    { id: 'interviews-scheduled', label: 'Interviews Scheduled', value: 0 },
-    { id: 'offers-extended', label: 'Offers Extended', value: 0 },
-  ],
-  applicationsTrend: [], // [{ month, applications }]
-  upcomingDrives: [], // [{ id, company, role, date }]
-  recentActivity: [], // [{ id, title, subtitle, date }]
-};
 
-// Fetches all data needed by the Main Dashboard page in one call.
-// Swap the endpoint path for whatever the backend actually exposes.
+const ACTIVE_DRIVE_STATUSES = ['UPCOMING', 'ONGOING'];
+
 export async function getMainDashboardOverview() {
-  try {
-    const { data } = await api.get('/main-dashboard/overview');
-    return data;
-  } catch (error) {
-    console.warn(
-      '[mainDashboardService] Falling back to empty dashboard state — API call failed:',
-      error.message
-    );
-    return EMPTY_MAIN_DASHBOARD_DATA;
-  }
-}
+  const [placements, companies] = await Promise.all([getPlacements(), getCompanies()]);
 
-export { EMPTY_MAIN_DASHBOARD_DATA };
+  const companyNames = new Map(companies.map((c) => [c.id, c.companyName]));
+  const companyOf = (drive) => companyNames.get(drive.companyId) ?? `Company #${drive.companyId}`;
+
+  // Unique drives seen through placement records.
+  const drives = new Map();
+  placements.forEach((p) => {
+    if (p.drive) drives.set(p.drive.id, p.drive);
+  });
+  const driveList = [...drives.values()];
+
+  const countStatus = (...statuses) => placements.filter((p) => statuses.includes(p.status)).length;
+
+  // Placement records created/updated per month over the last 6 months.
+  const months = lastMonths(6);
+  const perMonth = new Map(months.map((m) => [m.key, 0]));
+  placements.forEach((p) => {
+    const key = monthKey(p.updatedAt);
+    if (perMonth.has(key)) perMonth.set(key, perMonth.get(key) + 1);
+  });
+  const trend = months.map(({ key, month }) => ({ month, records: perMonth.get(key) }));
+  const hasTrend = trend.some((point) => point.records > 0);
+
+  const upcomingDrives = driveList
+    .filter((d) => d.status === 'UPCOMING')
+    .sort((a, b) => new Date(a.driveDate) - new Date(b.driveDate))
+    .slice(0, 5)
+    .map((d) => ({ id: d.id, company: companyOf(d), role: d.role, date: formatDate(d.driveDate) }));
+
+  const recentActivity = [...placements]
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .slice(0, 8)
+    .map((p) => ({
+      id: p.id,
+      title: `Student #${p.studentId}${p.student?.branch ? ` (${p.student.branch})` : ''} — ${humanize(p.status)}`,
+      subtitle: p.drive ? `${p.drive.role} at ${companyOf(p.drive)}` : '',
+      date: formatDate(p.updatedAt),
+    }));
+
+  return {
+    summary: [
+      {
+        id: 'active-drives',
+        label: 'Active Drives',
+        value: driveList.filter((d) => ACTIVE_DRIVE_STATUSES.includes(d.status)).length,
+      },
+      { id: 'total-applications', label: 'Placement Records', value: placements.length },
+      {
+        id: 'interviews-scheduled',
+        label: 'Interviews Scheduled',
+        value: countStatus('INTERVIEW_SCHEDULED'),
+      },
+      { id: 'offers-extended', label: 'Offers Extended', value: countStatus('SELECTED', 'OFFER_ACCEPTED') },
+    ],
+    applicationsTrend: hasTrend ? trend : [],
+    upcomingDrives,
+    recentActivity,
+  };
+}

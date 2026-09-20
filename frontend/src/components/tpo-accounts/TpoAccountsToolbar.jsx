@@ -5,7 +5,14 @@ import './TpoAccountsToolbar.css';
 // Purely presentational: search text + status filter are controlled by
 // the page, which does the actual filtering of whatever list it got from
 // tpoAccountsService.
-function TpoAccountsToolbar({ searchTerm, onSearchChange, statusFilter, onStatusFilterChange, onAddAccount }) {
+function TpoAccountsToolbar({
+  searchTerm,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  onAddAccount,
+  addDisabledReason,
+}) {
   return (
     <div className="tpo-toolbar">
       <div className="tpo-toolbar__search">
@@ -29,7 +36,13 @@ function TpoAccountsToolbar({ searchTerm, onSearchChange, statusFilter, onStatus
         <option value="suspended">Suspended</option>
       </select>
 
-      <button type="button" className="tpo-toolbar__add-btn" onClick={onAddAccount}>
+      <button
+        type="button"
+        className="tpo-toolbar__add-btn"
+        onClick={onAddAccount}
+        disabled={!onAddAccount}
+        title={!onAddAccount ? addDisabledReason : undefined}
+      >
         <FaUserPlus aria-hidden="true" /> Add TPO Account
       </button>
     </div>

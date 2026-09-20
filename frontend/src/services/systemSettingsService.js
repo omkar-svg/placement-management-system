@@ -1,13 +1,15 @@
-import api from './api.js';
+// ============================================================
+// SYSTEM SETTINGS — not supported by the backend yet
+//
+// There is no settings model or endpoint. Needed on the backend:
+//   GET /api/system-settings
+//   PUT /api/system-settings
+//
+// Until then the form starts from the neutral defaults below (blank
+// fields, toggles off — not business data) and cannot be saved.
+// ============================================================
+export const SYSTEM_SETTINGS_SUPPORTED = false;
 
-// ============================================================
-// SYSTEM SETTINGS — data policy
-// There is no original design to copy configured values from, so every
-// field below starts blank/off. These are neutral UI defaults for form
-// controls (an empty text field, a toggle in the "off" position) — not
-// invented business data or metrics. Once the real settings endpoint
-// exists, its response overrides these defaults entirely.
-// ============================================================
 const EMPTY_SYSTEM_SETTINGS = {
   general: {
     platformName: '',
@@ -30,28 +32,5 @@ const EMPTY_SYSTEM_SETTINGS = {
 };
 
 export async function getSystemSettings() {
-  try {
-    const { data } = await api.get('/system-settings');
-    return data;
-  } catch (error) {
-    console.warn(
-      '[systemSettingsService] Falling back to empty settings — API call failed:',
-      error.message
-    );
-    return EMPTY_SYSTEM_SETTINGS;
-  }
+  return EMPTY_SYSTEM_SETTINGS;
 }
-
-// Persists the full settings object. Stub until the real backend
-// endpoint exists — the page still updates its own local state so the
-// form feels functional.
-export async function updateSystemSettings(settings) {
-  try {
-    await api.put('/system-settings', settings);
-  } catch (error) {
-    console.warn('[systemSettingsService] settings not persisted (no backend yet):', error.message);
-  }
-  return settings;
-}
-
-export { EMPTY_SYSTEM_SETTINGS };

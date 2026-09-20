@@ -57,3 +57,8 @@
 .tpo-toolbar__add-btn:hover {
   background: var(--color-navy-800);
 }
+
+.tpo-toolbar__add-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

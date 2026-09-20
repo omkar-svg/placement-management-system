@@ -11,7 +11,7 @@ function ReportsTable({ reports }) {
         <EmptyState
           icon={FaFileAlt}
           title="No reports available yet"
-          description="Reports you generate, or ones produced by scheduled jobs, will be listed here."
+          description="The backend does not have a reports endpoint yet, so nothing can be shown here."
         />
       </div>
     );

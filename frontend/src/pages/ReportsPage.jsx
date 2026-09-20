@@ -2,18 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import ReportsToolbar from '../components/reports/ReportsToolbar.jsx';
 import ReportsTable from '../components/reports/ReportsTable.jsx';
-import { getReports, generateReport } from '../services/reportsService.js';
+import { getReports } from '../services/reportsService.js';
 import './ReportsPage.css';
 
-// Reports page. Fetches through reportsService.js on mount — starts as
-// an empty list (see the data policy comment in that service) until real
-// report records exist. "Generate Report" is wired to the service stub
-// so it's ready to work the moment the backend endpoint exists.
+// Reports page. Loads through reportsService.js on mount. The backend has
+// no reports endpoint yet (see that service), so the list is empty and
+// "Generate Report" is disabled.
 function ReportsPage() {
   const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState('all');
-  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,15 +35,6 @@ function ReportsPage() {
     return reports.filter((report) => report.type === typeFilter);
   }, [reports, typeFilter]);
 
-  const handleGenerateReport = async () => {
-    setIsGenerating(true);
-    const newReport = await generateReport(typeFilter === 'all' ? 'placements' : typeFilter);
-    if (newReport) {
-      setReports((current) => [newReport, ...current]);
-    }
-    setIsGenerating(false);
-  };
-
   return (
     <DashboardLayout>
       <div className="reports-page__intro">
@@ -56,8 +45,7 @@ function ReportsPage() {
       <ReportsToolbar
         typeFilter={typeFilter}
         onTypeFilterChange={setTypeFilter}
-        onGenerateReport={handleGenerateReport}
-        isGenerating={isGenerating}
+        generateDisabledReason="Not available yet — the backend has no reports endpoint."
       />
 
       {isLoading ? (

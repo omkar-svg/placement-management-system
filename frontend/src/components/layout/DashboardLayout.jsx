@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from './Sidebar.jsx';
+import AdminSidebar from './AdminSidebar.jsx';
 import './DashboardLayout.css';
 
 // Wraps any page in the shared sidebar + content area, so every page
@@ -12,7 +12,7 @@ import './DashboardLayout.css';
 function DashboardLayout({ children }) {
   return (
     <div className="app-shell">
-      <Sidebar />
+      <AdminSidebar />
       <main className="app-main">{children}</main>
     </div>
   );

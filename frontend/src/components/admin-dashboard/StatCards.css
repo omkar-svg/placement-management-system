@@ -26,14 +26,14 @@
   flex-shrink: 0;
 }
 
-.stat-card__icon--total-users,
-.stat-card__icon--tpo-accounts {
+.stat-card__icon--companies,
+.stat-card__icon--placement-records {
   background: var(--color-navy-900);
 }
 .stat-card__icon--system-health {
   background: var(--color-purple);
 }
-.stat-card__icon--security-alerts {
+.stat-card__icon--students-selected {
   background: var(--color-navy-950);
 }
 

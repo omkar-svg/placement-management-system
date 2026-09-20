@@ -11,7 +11,7 @@ function TpoAccountsTable({ accounts, onStatusChange }) {
         <EmptyState
           icon={FaUniversity}
           title="No TPO accounts data available yet"
-          description="Accounts approved from Pending TPO Registrations, or added here, will be listed in this table."
+          description="The backend does not have an endpoint for listing TPO accounts yet, so nothing can be shown here."
         />
       </div>
     );
@@ -41,12 +41,12 @@ function TpoAccountsTable({ accounts, onStatusChange }) {
                 </span>
               </td>
               <td className="tpo-table__actions">
-                {account.status !== 'active' && (
+                {onStatusChange && account.status !== 'active' && (
                   <button type="button" onClick={() => onStatusChange(account.id, 'active')}>
                     Activate
                   </button>
                 )}
-                {account.status !== 'suspended' && (
+                {onStatusChange && account.status !== 'suspended' && (
                   <button type="button" onClick={() => onStatusChange(account.id, 'suspended')}>
                     Suspend
                   </button>

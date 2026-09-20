@@ -20,7 +20,7 @@ function AuditLogsTable({ logs }) {
         <EmptyState
           icon={FaHistory}
           title="No audit log entries yet"
-          description="Role changes, account approvals, and system updates will be recorded here."
+          description="The backend does not record or expose audit logs yet, so nothing can be shown here."
         />
       </div>
     );

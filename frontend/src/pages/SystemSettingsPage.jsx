@@ -4,17 +4,16 @@ import GeneralSettings from '../components/system-settings/GeneralSettings.jsx';
 import NotificationSettings from '../components/system-settings/NotificationSettings.jsx';
 import SecuritySettings from '../components/system-settings/SecuritySettings.jsx';
 import AppearanceSettings from '../components/system-settings/AppearanceSettings.jsx';
-import { getSystemSettings, updateSystemSettings } from '../services/systemSettingsService.js';
+import { getSystemSettings } from '../services/systemSettingsService.js';
 import './SystemSettingsPage.css';
 
 // System Settings page. Loads through systemSettingsService.js on mount.
-// Every field starts blank/off (see the data policy comment in that
-// service) until a real settings endpoint exists — the form itself is
-// fully functional and ready to save once it does.
+// The backend has no settings endpoint yet (see that service), so every
+// field starts blank/off and the form is read-only: nothing can be saved,
+// and the page says so instead of pretending to.
 function SystemSettingsPage() {
   const [settings, setSettings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [saveState, setSaveState] = useState('idle'); // idle | saving | saved
 
   useEffect(() => {
     let isMounted = true;
@@ -35,13 +34,6 @@ function SystemSettingsPage() {
 
   const updateSection = (section, value) => {
     setSettings((current) => ({ ...current, [section]: value }));
-    setSaveState('idle');
-  };
-
-  const handleSave = async () => {
-    setSaveState('saving');
-    await updateSystemSettings(settings);
-    setSaveState('saved');
   };
 
   if (isLoading || !settings) {
@@ -59,23 +51,35 @@ function SystemSettingsPage() {
           <h1>System Settings</h1>
           <p>Configure platform-wide options for the admin dashboard.</p>
         </div>
-        <button type="button" className="system-settings-page__save-btn" onClick={handleSave}>
-          {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved ✓' : 'Save Changes'}
+        <button
+          type="button"
+          className="system-settings-page__save-btn"
+          disabled
+          title="Not available yet — the backend has no system-settings endpoint."
+        >
+          Save Changes
         </button>
       </div>
 
-      <div className="system-settings-page__grid">
-        <GeneralSettings settings={settings.general} onChange={(value) => updateSection('general', value)} />
-        <NotificationSettings
-          settings={settings.notifications}
-          onChange={(value) => updateSection('notifications', value)}
-        />
-        <SecuritySettings settings={settings.security} onChange={(value) => updateSection('security', value)} />
-        <AppearanceSettings
-          settings={settings.appearance}
-          onChange={(value) => updateSection('appearance', value)}
-        />
-      </div>
+      <p className="system-settings-page__notice" role="note">
+        System settings can't be changed yet: the backend has no system-settings endpoint. These options are shown
+        for reference and will become editable once it exists.
+      </p>
+
+      <fieldset className="system-settings-page__fieldset" disabled>
+        <div className="system-settings-page__grid">
+          <GeneralSettings settings={settings.general} onChange={(value) => updateSection('general', value)} />
+          <NotificationSettings
+            settings={settings.notifications}
+            onChange={(value) => updateSection('notifications', value)}
+          />
+          <SecuritySettings settings={settings.security} onChange={(value) => updateSection('security', value)} />
+          <AppearanceSettings
+            settings={settings.appearance}
+            onChange={(value) => updateSection('appearance', value)}
+          />
+        </div>
+      </fieldset>
     </DashboardLayout>
   );
 }
