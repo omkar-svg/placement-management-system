@@ -261,12 +261,12 @@ const getEligibleStudents = async (req, res) => {
             const reasons = []
 
             //check minimum CGPA
-            if (student.cgpa < eligibilityCriteria.minCGPA) {
+            if (eligibilityCriteria.minCGPA !== null && student.cgpa < eligibilityCriteria.minCGPA) {
                 reasons.push("CGPA is lower than required CGPA")
             }
 
             //check maximum active backlogs
-            if (student.activeBacklogs > eligibilityCriteria.maxBacklogs) {
+            if (eligibilityCriteria.maxBacklogs !== null && student.activeBacklogs > eligibilityCriteria.maxBacklogs) {
                 reasons.push("active backlogs are more than allowed limit")
             }
 
@@ -282,7 +282,7 @@ const getEligibleStudents = async (req, res) => {
             const studentGraduationYear = student.year + 4 //+4 for all four years of college
 
             //check graduation year
-            if (studentGraduationYear !== eligibilityCriteria.graduationYear) {
+            if (eligibilityCriteria.graduationYear !== null && studentGraduationYear !== eligibilityCriteria.graduationYear) {
                 reasons.push("your graduation year does not match")
             }
 
