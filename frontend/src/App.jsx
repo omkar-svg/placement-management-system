@@ -10,6 +10,10 @@ import TpoAccountsPage from './pages/TpoAccountsPage.jsx';
 import SystemSettingsPage from './pages/SystemSettingsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import AuditLogsPage from './pages/AuditLogsPage.jsx';
+import { Routes, Route, Navigate } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
+import AuthPage from './pages/AuthPage'
+import StudentDashboard from './pages/StudentDashboard'
 
 function App() {
   return (
@@ -18,6 +22,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
 
       {/* Student */}
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/register" element={<Navigate to="/login" replace />} />
       <Route path="/student/dashboard" element={<StudentDashboard />} />
 
       {/* Admin */}
