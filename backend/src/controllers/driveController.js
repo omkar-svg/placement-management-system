@@ -21,7 +21,7 @@ const setEligibility = async (req, res) => {
         const driveId = Number(dId)
 
         //check if the driveId is parsed successfully or not
-        if (isNaN(driveId) || driveId <= 0) {
+        if (!Number.isInteger(driveId) || driveId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "invalid drive ID"
@@ -119,7 +119,7 @@ const getEligibility = async (req, res) => {
         const driveId = Number(dId)
 
         //check if the driveId is parsed successfully or not
-        if (isNaN(driveId) || driveId <= 0) {
+        if (!Number.isInteger(driveId) || driveId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "invalid drive ID"
@@ -191,7 +191,7 @@ const getEligibleStudents = async (req, res) => {
         const driveId = Number(dId)
 
         //check if the driveId is parsed successfully or not
-        if (isNaN(driveId) || driveId <= 0) {
+        if (!Number.isInteger(driveId) || driveId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "invalid drive ID"
