@@ -229,8 +229,26 @@ const getEligibleStudents = async (req, res) => {
 
         //get all students from the database
         const students = await prisma.student.findMany({
-            include: {
-                user: true
+            select: {
+                id: true,
+                prn: true,
+                branch: true,
+                year: true,
+                cgpa: true,
+                activeBacklogs: true,
+                phone: true,
+                linkedin: true,
+                github: true,
+                portfolio: true,
+                profileCompleted: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true
+                    }
+                }
             }
         })
 
