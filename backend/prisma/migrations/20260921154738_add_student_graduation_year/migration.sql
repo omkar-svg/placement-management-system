@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `student` ADD COLUMN `graduationYear` INTEGER NULL;
+ALTER TABLE `Student` ADD COLUMN `graduationYear` INTEGER NULL;
