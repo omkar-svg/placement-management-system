@@ -234,6 +234,7 @@ const getEligibleStudents = async (req, res) => {
                 prn: true,
                 branch: true,
                 year: true,
+                graduationYear: true,
                 cgpa: true,
                 activeBacklogs: true,
                 phone: true,
@@ -278,11 +279,8 @@ const getEligibleStudents = async (req, res) => {
                 reasons.push(" your branch is not eligible")
             }
 
-            //calculate graduation year of student
-            const studentGraduationYear = student.year + 4 //+4 for all four years of college
-
             //check graduation year
-            if (eligibilityCriteria.graduationYear !== null && studentGraduationYear !== eligibilityCriteria.graduationYear) {
+            if (eligibilityCriteria.graduationYear !== null && student.graduationYear !== eligibilityCriteria.graduationYear) {
                 reasons.push("your graduation year does not match")
             }
 
