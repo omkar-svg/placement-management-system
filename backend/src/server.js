@@ -7,9 +7,9 @@ const prisma = require("./prismaClient");
 const authRoutes = require('./routes/authRoutes');
 const driveRoutes = require('./routes/driveRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
-const authRoutes = require("./routes/authRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
+const placementRoutes = require("./routes/placementRoutes");
 const companyRoutes = require("./routes/companyRoutes");
+
 
 dotenv.config();
 if (!process.env.JWT_SECRET?.trim()) {
@@ -55,15 +55,11 @@ app.get("/api/health", async (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 // app.use('/api/students', studentRoutes);
-// app.use('/api/companies', companyRoutes);
 app.use('/api/drives', driveRoutes);
 app.use('/api/notifications', notificationRoutes);
-// Routes will be registered here in next phase
-app.use("/api/auth", authRoutes);
-// app.use('/api/students', studentRoutes);
 app.use("/api/companies", companyRoutes);
-// app.use('/api/drives', driveRoutes);
-app.use("/api/notifications", notificationRoutes);
+app.use('/api/placements', placementRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 
