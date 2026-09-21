@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
-import { getHomePath } from '../utils/roleRoutes';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -14,7 +13,7 @@ export default function AuthPage() {
     const token = authService.getToken();
     if (token) {
       const user = authService.getUser();
-      navigate(getHomePath(user?.role), { replace: true });
+      navigate(user?.role === 'STUDENT' ? '/student/dashboard' : '/', { replace: true });
     }
   }, [navigate]);
 
@@ -42,7 +41,7 @@ export default function AuthPage() {
         setStatus({ error: '', success: 'Signed in successfully! Redirecting...', loading: false });
         const role = res?.data?.user?.role;
         setTimeout(() => {
-          navigate(getHomePath(role));
+          navigate(role === 'STUDENT' ? '/student/dashboard' : '/');
         }, 500);
       } else {
         setStatus({ error: res?.message || 'Invalid credentials.', success: '', loading: false });
