@@ -1,6 +1,6 @@
 // Drive Controller
 
-const prisma = require("../prisma");
+const prisma = require("../prismaClient");
 
 // Validate Placement Drive fields
 const validateDriveFields = async ({
@@ -10,7 +10,8 @@ const validateDriveFields = async ({
     deadline,
     jobType,
     role,
-    venue
+    venue,
+    checkDeadlineInFuture = true
 }) => {
 
     // Package must not be empty
@@ -44,15 +45,21 @@ const validateDriveFields = async ({
     }
 
     // Deadline should not be in the past
-    if (deadline && new Date(deadline).getTime() < Date.now()) {
+    if (deadline && checkDeadlineInFuture && new Date(deadline).getTime() < Date.now()) {
         return "Deadline cannot be in the past";
     }
 
     // Company must exist
     if (companyId !== undefined) {
+        const numericCompanyId = Number(companyId);
+
+        if (isNaN(numericCompanyId)) {
+            return "companyId must be a valid number";
+        }
+
         const company = await prisma.company.findUnique({
             where: {
-                id: Number(companyId)
+                id: numericCompanyId
             }
         });
 
@@ -110,7 +117,7 @@ const createDrive = async (req, res) => {
             });
         }
 
-        // Validate additional fields
+        // Validate additional fields (deadline must be in the future on create)
         const validationError = await validateDriveFields({
             companyId,
             packageAmount,
@@ -118,7 +125,8 @@ const createDrive = async (req, res) => {
             deadline,
             jobType,
             role,
-            venue
+            venue,
+            checkDeadlineInFuture: true
         });
 
         if (validationError) {
@@ -333,7 +341,7 @@ const updateDrive = async (req, res) => {
             });
         }
 
-        // Use updated values or existing values for validation
+        // Use updated values or existing values for cross-field validation
         const effectiveDriveDate =
             updateData.driveDate ?? existingDrive.driveDate;
 
@@ -362,7 +370,12 @@ const updateDrive = async (req, res) => {
             deadline: effectiveDeadline,
             jobType: effectiveJobType,
             role: effectiveRole,
-            venue: effectiveVenue
+            venue: effectiveVenue,
+            // Only enforce "deadline can't be in the past" when the caller is
+            // actually changing the deadline — not when we're just carrying
+            // the existing (possibly already-past) deadline forward for the
+            // ordering check above.
+            checkDeadlineInFuture: updateData.deadline !== undefined
         });
 
         if (validationError) {
