@@ -65,6 +65,7 @@ model Student {
   prn              String   @unique
   branch           String
   year             Int
+  graduationYear   Int?
   cgpa             Float
   activeBacklogs   Int      @default(0)
   phone            String
