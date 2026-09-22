@@ -1,0 +1,191 @@
+// Placement Management System - Prisma Schema
+// Database: MySQL
+// Approach: Code First
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  TPO
+  STUDENT
+}
+
+enum DriveStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+}
+
+enum StudentStatus {
+  ELIGIBLE
+  SHORTLISTED
+  INTERVIEW_SCHEDULED
+  SELECTED
+  REJECTED
+  OFFER_ACCEPTED
+}
+
+enum NotificationType {
+  ANNOUNCEMENT
+  COMPANY
+  DRIVE
+  REMINDER
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  student       Student?
+  drives        PlacementDrive[] @relation("CreatedDrives")
+  notifications Notification[]
+}
+
+model Student {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  prn              String   @unique
+  branch           String
+  year             Int
+  graduationYear   Int?
+  cgpa             Float
+  activeBacklogs   Int      @default(0)
+  phone            String
+  linkedin         String?
+  github           String?
+  portfolio        String?
+  profileCompleted Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user              User              @relation(fields: [userId], references: [id])
+  resume            Resume?
+  skills            StudentSkill[]
+  placementStatuses PlacementStatus[]
+}
+
+model StudentSkill {
+  id        Int    @id @default(autoincrement())
+  studentId Int
+  skillName String
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, skillName])
+}
+
+model Company {
+  id          Int      @id @default(autoincrement())
+  companyName String
+  about       String   @db.Text
+  location    String
+  website     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  drives PlacementDrive[]
+}
+
+model PlacementDrive {
+  id            Int         @id @default(autoincrement())
+  companyId     Int
+  createdBy     Int
+  role          String
+  package       String
+  driveDate     DateTime
+  venue         String
+  deadline      DateTime
+  jobType       String
+  description   String      @db.Text
+  hiringProcess String      @db.Text
+  status        DriveStatus @default(UPCOMING)
+  createdAt     DateTime    @default(now())
+
+  // Relations
+  company           Company              @relation(fields: [companyId], references: [id])
+  creator           User                 @relation("CreatedDrives", fields: [createdBy], references: [id])
+  eligibility       EligibilityCriteria?
+  placementStatuses PlacementStatus[]
+}
+
+model EligibilityCriteria {
+  id             Int    @id @default(autoincrement())
+  driveId        Int    @unique
+  minCGPA        Float?
+  maxBacklogs    Int?
+  graduationYear Int?
+
+  // Relations
+  drive            PlacementDrive   @relation(fields: [driveId], references: [id])
+  eligibleBranches EligibleBranch[]
+}
+
+model EligibleBranch {
+  id            Int    @id @default(autoincrement())
+  eligibilityId Int
+  branch        String
+
+  // Relations
+  eligibility EligibilityCriteria @relation(fields: [eligibilityId], references: [id])
+
+  @@unique([eligibilityId, branch])
+}
+
+model PlacementStatus {
+  id        Int           @id @default(autoincrement())
+  studentId Int
+  driveId   Int
+  status    StudentStatus @default(ELIGIBLE)
+  remarks   String?
+  updatedAt DateTime      @updatedAt
+
+  // Relations
+  student Student        @relation(fields: [studentId], references: [id])
+  drive   PlacementDrive @relation(fields: [driveId], references: [id])
+
+  @@unique([studentId, driveId])
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String           @db.Text
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Resume {
+  id         Int      @id @default(autoincrement())
+  studentId  Int      @unique
+  resumeUrl  String
+  uploadedAt DateTime @default(now())
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [id])
+}
