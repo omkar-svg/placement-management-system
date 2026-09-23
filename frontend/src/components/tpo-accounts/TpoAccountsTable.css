@@ -1,0 +1,79 @@
+.tpo-table {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.tpo-table--empty {
+  padding: 8px;
+}
+
+.tpo-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tpo-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tpo-table td {
+  padding: 14px 20px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tpo-table tr:last-child td {
+  border-bottom: none;
+}
+
+.tpo-table__status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.tpo-table__status--active {
+  background: #e4f7ec;
+  color: var(--color-success);
+}
+
+.tpo-table__status--pending {
+  background: var(--color-gold-100);
+  color: var(--color-gold-500);
+}
+
+.tpo-table__status--suspended {
+  background: #fbe9e9;
+  color: var(--color-danger);
+}
+
+.tpo-table__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tpo-table__actions button {
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.tpo-table__actions button:hover {
+  background: var(--color-bg);
+}
