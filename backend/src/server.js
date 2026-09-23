@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const placementRoutes = require("./routes/placementRoutes");
 const companyRoutes = require("./routes/companyRoutes");
+const driveRoutes = require("./routes/driveRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
 
@@ -54,11 +55,11 @@ app.get("/api/health", async (req, res) => {
   res.status(statusCode).json(healthData);
 });
 
-// Routes will be registered here in next phase
+// Routes
 app.use("/api/auth", authRoutes);
 // app.use('/api/students', studentRoutes);
 app.use("/api/companies", companyRoutes);
-// app.use('/api/drives', driveRoutes);
+app.use("/api/drives", driveRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/placements", placementRoutes);
 app.use("/api/dashboard", dashboardRoutes);
