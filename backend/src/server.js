@@ -58,6 +58,8 @@ app.get("/api/health", async (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 // app.use('/api/students', studentRoutes);
+app.use('/api/drives', driveRoutes);
+
 app.use("/api/companies", companyRoutes);
 app.use("/api/drives", driveRoutes);
 app.use("/api/notifications", notificationRoutes);
