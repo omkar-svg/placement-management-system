@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // --- Pages from the Main frontend (unchanged) ---
 import LandingPage from './pages/LandingPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import StudentDashboard from './pages/StudentDashboard.jsx';
-import AdminSetupPage from './pages/AdminSetupPage.jsx';
+
+import AutoAdminAccess from './components/auth/AutoAdminAccess.jsx';
+import Logout from './components/auth/Logout.jsx';
 
 // --- Admin pages ---
-import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
-import MainDashboardPage from './pages/MainDashboardPage.jsx';
-import TpoAccountsPage from './pages/TpoAccountsPage.jsx';
-import SystemSettingsPage from './pages/SystemSettingsPage.jsx';
-import ReportsPage from './pages/ReportsPage.jsx';
-import AuditLogsPage from './pages/AuditLogsPage.jsx';
-
-import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
-import Logout from './components/auth/Logout.jsx';
+// Lazy-loaded: these pull in recharts and the rest of the admin bundle,
+// so students/public visitors never download that code on pages that
+// don't need it (only paid when someone actually opens an admin route).
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage.jsx'));
+const MainDashboardPage = lazy(() => import('./pages/MainDashboardPage.jsx'));
+const TpoAccountsPage = lazy(() => import('./pages/TpoAccountsPage.jsx'));
+const SystemSettingsPage = lazy(() => import('./pages/SystemSettingsPage.jsx'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx'));
+const AuditLogsPage = lazy(() => import('./pages/AuditLogsPage.jsx'));
 
 // ============================================================
 // APP ROUTES
@@ -25,10 +27,24 @@ import Logout from './components/auth/Logout.jsx';
 // ============================================================
 
 // Admin pages are only for users whose backend role is ADMIN.
-// Protected routes are temporarily disabled (not removed) — to re-enable,
-// swap the line below for:
+//
+// There is no seed script and no public self-registration (that would be
+// a real security hole — see PR #25 review). Instead, AutoAdminAccess
+// transparently signs into (creating on first run) a local-only demo
+// ADMIN account before rendering the page, using the existing
+// register/login endpoints. It never renders `children` until a real
+// user is loaded, so `user` is never null inside an admin page.
+//
+// To go back to normal login-required access, swap this for:
+//   import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 //   const adminOnly = (page) => <ProtectedRoute allowedRoles={['ADMIN']}>{page}</ProtectedRoute>;
-const adminOnly = (page) => page;
+const adminOnly = (page) => (
+  <AutoAdminAccess>
+    <Suspense fallback={<div style={{ padding: 32, fontFamily: 'sans-serif' }}>Loading…</div>}>
+      {page}
+    </Suspense>
+  </AutoAdminAccess>
+);
 
 function App() {
   return (
@@ -36,7 +52,6 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<Navigate to="/login" replace />} />
-      <Route path="/admin-setup" element={<AdminSetupPage />} />
       <Route path="/logout" element={<Logout />} />
 
       {/* Student (Main frontend) */}

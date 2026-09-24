@@ -28,7 +28,7 @@ function DashboardHeader({ academicYear, notificationCount, messageCount }) {
       <div className="dashboard-header__hero">
         <div className="dashboard-header__welcome">
           <h1>
-            Welcome back, <span className="dashboard-header__welcome-name">{user.name}</span>{' '}
+            Welcome back, <span className="dashboard-header__welcome-name">{user?.name || 'Admin'}</span>{' '}
             <span role="img" aria-label="waving hand">👋</span>
           </h1>
           <p>Here's your central admin overview.</p>

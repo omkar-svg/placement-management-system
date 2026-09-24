@@ -43,7 +43,7 @@ function AutoAdminAccess({ children }) {
         // exists on this machine's DB, so this alone succeeds.
         await login(credentials);
         if (!cancelled) setStatus('ready');
-      } catch (loginErr) {
+      } catch {
         // Likely means the account doesn't exist on this DB yet — create it,
         // then log in for real.
         try {

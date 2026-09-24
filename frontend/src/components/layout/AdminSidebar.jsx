@@ -65,9 +65,9 @@ function AdminSidebar() {
       <div className="sidebar__spacer" />
 
       <div className="sidebar__profile">
-        <Avatar name={user.name} size={64} online />
-        <p className="sidebar__profile-name">{user.name}</p>
-        <p className="sidebar__profile-role">{ROLE_LABELS[user.role] ?? user.role}</p>
+        <Avatar name={user?.name || 'Admin'} size={64} online />
+        <p className="sidebar__profile-name">{user?.name || 'Admin'}</p>
+        <p className="sidebar__profile-role">{ROLE_LABELS[user?.role] ?? user?.role ?? 'Admin'}</p>
       </div>
 
       <div className="sidebar__divider" />
