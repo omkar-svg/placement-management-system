@@ -66,6 +66,8 @@ model Student {
   branch           String
   year             Int
   graduationYear   Int?
+  tenthPercentage  Float?
+  twelfthPercentage Float?
   cgpa             Float
   activeBacklogs   Int      @default(0)
   phone            String
@@ -133,6 +135,8 @@ model EligibilityCriteria {
   id             Int  @id @default(autoincrement())
   driveId        Int  @unique
   minCGPA        Float?
+  minTenthPercentage Float?
+  minTwelfthPercentage Float?
   maxBacklogs    Int?
   graduationYear Int?
 
