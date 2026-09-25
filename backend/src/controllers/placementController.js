@@ -146,6 +146,9 @@ const updatePlacementStatus = async (req, res) => {
             });
         }
 
+        const statusChanged = existingPlacement.status !== status;
+        const remarksChanged = existingPlacement.remarks !== remarks;
+
         const updatedPlacement = await prisma.$transaction(async (tx) => {
 
             const updatedPlacement = await tx.placementStatus.update({
@@ -158,14 +161,16 @@ const updatePlacementStatus = async (req, res) => {
                 }
             });
 
-            await tx.placementStatusHistory.create({
-                data: {
-                    placementId,
-                    status,
-                    remarks,
-                    changedByUserId: req.user.id
-                }
-            });
+            if (statusChanged || remarksChanged) {
+                await tx.placementStatusHistory.create({
+                    data: {
+                        placementId,
+                        status,
+                        remarks,
+                        changedByUserId: req.user.id
+                    }
+                });
+            }
 
             return updatedPlacement;
         });
