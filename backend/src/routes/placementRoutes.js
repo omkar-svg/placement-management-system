@@ -3,7 +3,8 @@ const express = require("express");
 const {
     getPlacements,
     getPlacementById,
-    updatePlacementStatus
+    updatePlacementStatus,
+    getPlacementHistory
 } = require("../controllers/placementController");
 
 
@@ -14,8 +15,10 @@ const router = express.Router();
 
 router.get("/", authMiddleware, roleMiddleware("ADMIN", "TPO"), getPlacements);
 
+router.get("/:id/history", authMiddleware, roleMiddleware("ADMIN", "TPO", "STUDENT"), getPlacementHistory);
 router.get("/:id", authMiddleware, roleMiddleware("ADMIN", "TPO", "STUDENT"), getPlacementById);
 
 router.put("/:id", authMiddleware, roleMiddleware("ADMIN", "TPO"), updatePlacementStatus);
+
 
 module.exports = router;
