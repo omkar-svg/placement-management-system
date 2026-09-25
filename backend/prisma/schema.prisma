@@ -54,29 +54,30 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  student       Student?
-  drives        PlacementDrive[] @relation("CreatedDrives")
-  notifications Notification[]
+  student                Student?
+  drives                 PlacementDrive[]         @relation("CreatedDrives")
+  notifications          Notification[]
+  placementStatusChanges PlacementStatusHistory[]
 }
 
 model Student {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @unique
-  prn              String   @unique
-  branch           String
-  year             Int
-  graduationYear   Int?
-  tenthPercentage  Float?
+  id                Int      @id @default(autoincrement())
+  userId            Int      @unique
+  prn               String   @unique
+  branch            String
+  year              Int
+  graduationYear    Int?
+  tenthPercentage   Float?
   twelfthPercentage Float?
-  cgpa             Float
-  activeBacklogs   Int      @default(0)
-  phone            String
-  linkedin         String?
-  github           String?
-  portfolio        String?
-  profileCompleted Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  cgpa              Float
+  activeBacklogs    Int      @default(0)
+  phone             String
+  linkedin          String?
+  github            String?
+  portfolio         String?
+  profileCompleted  Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   // Relations
   user              User              @relation(fields: [userId], references: [id])
@@ -132,16 +133,16 @@ model PlacementDrive {
 }
 
 model EligibilityCriteria {
-  id             Int  @id @default(autoincrement())
-  driveId        Int  @unique
-  minCGPA        Float?
-  minTenthPercentage Float?
+  id                   Int    @id @default(autoincrement())
+  driveId              Int    @unique
+  minCGPA              Float?
+  minTenthPercentage   Float?
   minTwelfthPercentage Float?
-  maxBacklogs    Int?
-  graduationYear Int?
+  maxBacklogs          Int?
+  graduationYear       Int?
 
   // Relations
-  drive            PlacementDrive @relation(fields: [driveId], references: [id])
+  drive            PlacementDrive   @relation(fields: [driveId], references: [id])
   eligibleBranches EligibleBranch[]
 }
 
@@ -165,8 +166,9 @@ model PlacementStatus {
   updatedAt DateTime      @updatedAt
 
   // Relations
-  student Student        @relation(fields: [studentId], references: [id])
-  drive   PlacementDrive @relation(fields: [driveId], references: [id])
+  student Student                  @relation(fields: [studentId], references: [id])
+  drive   PlacementDrive           @relation(fields: [driveId], references: [id])
+  history PlacementStatusHistory[]
 
   @@unique([studentId, driveId])
 }
@@ -192,4 +194,19 @@ model Resume {
 
   // Relations
   student Student @relation(fields: [studentId], references: [id])
+}
+
+model PlacementStatusHistory {
+  id Int @id @default(autoincrement())
+  placementId Int
+  status StudentStatus
+  remarks String?
+  changedAt DateTime @default(now())
+  changedByUserId Int
+
+  placement PlacementStatus @relation(fields: [placementId], references: [id], onDelete: Cascade)
+  changedBy User @relation(fields: [changedByUserId], references: [id])
+
+  @@index([placementId])
+  @@index([changedByUserId])
 }
