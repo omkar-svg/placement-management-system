@@ -2,7 +2,13 @@ const prisma = require("../prismaClient");
 
 const getPlacements = async (req, res) => {
     try {
+        const where = req.user.role === "STUDENT"
+            ? { student: { userId: req.user.id } }
+            : {};
         const placements = await prisma.placementStatus.findMany({
+
+            where
+            ,
             include: {
                 student: {
                     select: {
@@ -110,6 +116,7 @@ const updatePlacementStatus = async (req, res) => {
 
         const { status, remarks } = req.body;
 
+
         const validStatuses = [
             "ELIGIBLE",
             "SHORTLISTED",
@@ -147,7 +154,10 @@ const updatePlacementStatus = async (req, res) => {
         }
 
         const statusChanged = existingPlacement.status !== status;
-        const remarksChanged = existingPlacement.remarks !== remarks;
+        const remarksProvided = Object.prototype.hasOwnProperty.call(req.body, "remarks");
+        const newRemarks = remarksProvided ? remarks : existingPlacement.remarks;
+        const remarksChanged = remarksProvided && existingPlacement.remarks !== remarks;
+
 
         const updatedPlacement = await prisma.$transaction(async (tx) => {
 
@@ -157,7 +167,7 @@ const updatePlacementStatus = async (req, res) => {
                 },
                 data: {
                     status,
-                    remarks
+                    remarks: newRemarks
                 }
             });
 
@@ -166,7 +176,7 @@ const updatePlacementStatus = async (req, res) => {
                     data: {
                         placementId,
                         status,
-                        remarks,
+                        remarks: newRemarks,
                         changedByUserId: req.user.id
                     }
                 });
