@@ -1,0 +1,48 @@
+.upcoming-drives {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.upcoming-drives h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.upcoming-drives__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upcoming-drives__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.upcoming-drives__company {
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.upcoming-drives__role {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.upcoming-drives__date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-navy-900);
+  white-space: nowrap;
+}
