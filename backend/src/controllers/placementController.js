@@ -1,14 +1,7 @@
 const prisma = require("../prismaClient");
-
 const getPlacements = async (req, res) => {
     try {
-        const where = req.user.role === "STUDENT"
-            ? { student: { userId: req.user.id } }
-            : {};
         const placements = await prisma.placementStatus.findMany({
-
-            where
-            ,
             include: {
                 student: {
                     select: {
@@ -22,21 +15,19 @@ const getPlacements = async (req, res) => {
             }
         });
 
-
         return res.status(200).json({
             success: true,
             data: placements
         });
-
     } catch (error) {
         console.error(error);
-
         return res.status(500).json({
             success: false,
             message: "Server error"
         });
     }
 }
+
 
 const getPlacementById = async (req, res) => {
     try {
