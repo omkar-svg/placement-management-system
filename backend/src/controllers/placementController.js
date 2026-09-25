@@ -146,28 +146,14 @@ const updatePlacementStatus = async (req, res) => {
             });
         }
 
-        const updatedPlacement = await prisma.$transaction(async (tx) => {
-
-            const updatedPlacement = await tx.placementStatus.update({
-                where: {
-                    id: placementId
-                },
-                data: {
-                    status,
-                    remarks
-                }
-            });
-
-            await tx.placementStatusHistory.create({
-                data: {
-                    placementId,
-                    status,
-                    remarks,
-                    changedByUserId: req.user.id
-                }
-            });
-
-            return updatedPlacement;
+        const updatedPlacement = await prisma.placementStatus.update({
+            where: {
+                id: placementId
+            },
+            data: {
+                status,
+                remarks
+            }
         });
 
         return res.status(200).json({
@@ -185,86 +171,11 @@ const updatePlacementStatus = async (req, res) => {
     }
 }
 
-const getPlacementHistory = async (req, res) => {
-    try {
-        const placementId = Number(req.params.id);
-
-        if (!Number.isInteger(placementId) || placementId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid placement ID"
-            });
-        }
-
-        const placement = await prisma.placementStatus.findUnique({
-            where: {
-                id: placementId
-            }
-        });
-
-        if (!placement) {
-            return res.status(404).json({
-                success: false,
-                message: "Placement status not found"
-            });
-        }
-
-        if (req.user.role === "STUDENT") {
-            const student = await prisma.student.findUnique({
-                where: {
-                    userId: req.user.id
-                }
-            });
-            if (!student || placement.studentId !== student.id) {
-                return res.status(403).json({
-                    success: false,
-                    message: "Access denied"
-                });
-            }
-        }
-
-        const history = await prisma.placementStatusHistory.findMany({
-            where: {
-                placementId
-            },
-            orderBy: {
-                changedAt: "desc"
-            },
-            include: {
-                changedBy: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        role: true
-                    }
-                }
-            }
-        });
-
-        return res.status(200).json({
-            success: true,
-            data: history
-        });
-
-
-    } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Server error"
-        });
-    }
-}
-
-
 
 
 
 module.exports = {
     getPlacements,
     getPlacementById,
-    updatePlacementStatus,
-    getPlacementHistory
+    updatePlacementStatus
 };
