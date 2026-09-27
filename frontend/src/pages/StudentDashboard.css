@@ -1,0 +1,341 @@
+/* ---- Layout shell ------------------------------------------ */
+.sd-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--off-white);
+}
+
+.sd-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 24px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 6px rgba(11, 31, 58, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+/* Left: hamburger + title */
+.sd-header__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sd-header__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: var(--navy);
+  cursor: pointer;
+  transition: background 0.18s;
+  flex-shrink: 0;
+}
+
+.sd-header__menu-btn:hover {
+  background: var(--off-white);
+}
+
+.sd-header__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+/* Right: controls */
+.sd-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Notification bell */
+.sd-header__bell-wrap {
+  position: relative;
+}
+
+.sd-header__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: var(--navy);
+  cursor: pointer;
+  transition: background 0.18s;
+  flex-shrink: 0;
+}
+
+.sd-header__icon-btn:hover {
+  background: var(--off-white);
+}
+
+.sd-header__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--navy-dark);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid #ffffff;
+}
+
+/* Divider between bell and profile */
+.sd-header__divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* Profile chip */
+.sd-header__profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.sd-header__profile:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(255, 197, 44, 0.15);
+}
+
+.sd-header__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.sd-header__profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sd-header__profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy-dark);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.sd-header__profile-prn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.sd-header__chevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.sd-hero {
+  margin: 24px 24px 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(125deg, var(--navy-dark) 0%, var(--navy) 55%, var(--navy-light) 100%);
+  box-shadow: 0 4px 24px rgba(11, 31, 58, 0.18);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Subtle decorative ring */
+.sd-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 48px solid rgba(255, 197, 44, 0.07);
+  pointer-events: none;
+}
+
+.sd-hero__inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 24px;
+  min-height: 168px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Left text block */
+.sd-hero__content {
+  padding: 32px 0 32px 36px;
+}
+
+.sd-hero__greeting {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.sd-hero__greeting-name {
+  color: var(--gold);
+}
+
+.sd-hero__tagline {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 360px;
+}
+
+/* Gold accent bar under greeting */
+.sd-hero__accent {
+  display: inline-block;
+  width: 40px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gold);
+  margin-bottom: 12px;
+}
+
+/* Right campus image */
+.sd-hero__image-wrap {
+  padding: 0 32px 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  height: 168px;
+}
+
+.sd-hero__image {
+  width: 220px;
+  height: 168px;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+  opacity: 0.88;
+  display: block;
+  filter: brightness(0.92) contrast(1.04);
+}
+
+.sd-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+
+@media (max-width: 900px) {
+  .sd-hero__image {
+    width: 160px;
+  }
+
+  .sd-hero__greeting {
+    font-size: 1.4rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .sd-header {
+    padding: 0 16px;
+    height: 58px;
+  }
+
+  .sd-hero {
+    margin: 16px 16px 0;
+    border-radius: 14px;
+  }
+
+  .sd-hero__inner {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  .sd-hero__content {
+    padding: 24px 20px 0;
+  }
+
+  .sd-hero__greeting {
+    font-size: 1.25rem;
+  }
+
+  .sd-hero__tagline {
+    font-size: 0.875rem;
+    max-width: 100%;
+  }
+
+  .sd-hero__image-wrap {
+    padding: 0 20px 20px;
+    height: 120px;
+    justify-content: center;
+  }
+
+  .sd-hero__image {
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+  }
+
+  .sd-header__profile-info {
+    display: none;
+  }
+
+  .sd-header__divider {
+    display: none;
+  }
+}
