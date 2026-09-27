@@ -1,0 +1,16 @@
+.reports-page__intro h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.reports-page__intro p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.reports-page__loading {
+  padding: 48px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}

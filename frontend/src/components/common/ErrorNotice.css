@@ -1,0 +1,27 @@
+.error-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  background: #fdecec;
+  border: 1px solid #f3c1c1;
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+}
+
+.error-notice__message {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-notice__retry {
+  border: 1px solid var(--color-danger);
+  background: var(--color-white);
+  color: var(--color-danger);
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -1,0 +1,107 @@
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.stat-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.stat-card__icon--companies,
+.stat-card__icon--placement-records {
+  background: var(--color-navy-900);
+}
+.stat-card__icon--system-health {
+  background: var(--color-purple);
+}
+.stat-card__icon--students-selected {
+  background: var(--color-navy-950);
+}
+
+.stat-card__label {
+  margin: 0 0 2px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.stat-card__value {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.stat-card__subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-card__trend-icon {
+  color: var(--color-success);
+  font-size: 10px;
+}
+
+.stat-card--alert {
+  background: var(--color-gold-500);
+}
+
+.stat-card--alert .stat-card__label,
+.stat-card--alert .stat-card__value {
+  color: var(--color-navy-950);
+}
+
+.stat-card--alert .stat-card__icon {
+  background: rgba(16, 25, 58, 0.85);
+}
+
+.stat-card__cta {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-navy-950);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-card__cta:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1200px) {
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-cards {
+    grid-template-columns: 1fr;
+  }
+}
