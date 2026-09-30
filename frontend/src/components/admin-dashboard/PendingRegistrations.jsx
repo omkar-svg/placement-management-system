@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserClock } from 'react-icons/fa';
+import { FaUserClock } from 'react-icons/fa6';
 import Avatar from '../common/Avatar.jsx';
 import EmptyState from '../common/EmptyState.jsx';
 import './PendingRegistrations.css';
