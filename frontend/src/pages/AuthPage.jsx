@@ -8,7 +8,16 @@ export default function AuthPage() {
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [status, setStatus] = useState({ error: '', success: '', loading: false });
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('pms_remember_email');
+    if (savedEmail) {
+      setForm((prev) => ({ ...prev, email: savedEmail }));
+      setRememberMe(true);
+    }
+  }, []);
 
   useEffect(() => {
     const token = authService.getToken();
@@ -39,6 +48,11 @@ export default function AuthPage() {
     try {
       const res = await authService.login({ email: cleanEmail, password });
       if (res?.success) {
+        if (rememberMe) {
+          localStorage.setItem('pms_remember_email', cleanEmail);
+        } else {
+          localStorage.removeItem('pms_remember_email');
+        }
         setStatus({ error: '', success: 'Signed in successfully! Redirecting...', loading: false });
         const role = res?.data?.user?.role;
         setTimeout(() => {
@@ -62,20 +76,47 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col justify-between font-sans">
-      {/* Navbar: Deep Navy */}
-      <header className="bg-[#0b1528] text-white py-4 px-6 border-b border-slate-800">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="h-9 px-2.5 py-1 bg-white/10 rounded-lg flex items-center justify-center border border-white/20">
-              <img src="/DKTE-LOGO.png" alt="DKTE Logo" className="h-5 w-auto object-contain" />
+    <div className="min-h-screen bg-slate-100 flex flex-col justify-between">
+      {/* Navbar: Synchronized with Landing Page (#07152d) */}
+      <header className="border-b border-white/10 bg-[#07152d] text-white shadow-lg">
+        <div className="mx-auto flex h-[78px] max-w-[1320px] items-center justify-between px-4 sm:px-7 lg:px-10">
+          {/* Logo & College Identity */}
+          <Link
+            to="/"
+            className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-95"
+          >
+            <img
+              src="/DKTE-LOGO.png"
+              alt="DKTE Logo"
+              className="h-10 w-auto sm:h-11"
+            />
+
+            <div className="border-l border-white/25 pl-3 leading-tight">
+              <p className="text-xs font-bold text-white">
+                DKTE Society&apos;s
+              </p>
+
+              <p className="text-[10px] font-semibold text-white">
+                Textile & Engineering Institute
+              </p>
+
+              <p className="text-[9px] text-slate-300">
+                Ichalkaranji
+              </p>
             </div>
-            <span className="text-lg font-extrabold tracking-tight text-white">
-              DKTE <span className="text-amber-400">Placement Portal</span>
-            </span>
+
+            <div className="hidden border-l border-white/20 pl-3 leading-tight sm:block">
+              <span className="inline-flex items-center rounded-md bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-[#ffc52c]">
+                Placement Portal
+              </span>
+            </div>
           </Link>
-          <Link to="/" className="text-sm font-medium text-slate-300 hover:text-amber-400 transition-colors">
-            ← Home
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/5 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:border-[#ffc52c] hover:bg-white/10 hover:text-[#ffc52c]"
+          >
+            ← Back to Home
           </Link>
         </div>
       </header>
@@ -84,7 +125,7 @@ export default function AuthPage() {
       <main className="flex-1 flex items-center justify-center px-4 py-10 sm:py-14">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 sm:p-10">
           <div className="text-center mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0b1528] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#07152d] tracking-tight">
               Sign In
             </h1>
             <p className="text-sm text-slate-500 mt-1.5">
@@ -116,7 +157,7 @@ export default function AuthPage() {
                 value={form.email}
                 onChange={updateField}
                 placeholder="name@dkte.ac.in"
-                className="w-full h-11 px-4 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0b1528]"
+                className="w-full h-11 px-4 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#07152d]"
               />
             </div>
 
@@ -131,23 +172,38 @@ export default function AuthPage() {
                   value={form.password}
                   onChange={updateField}
                   placeholder="••••••••••••"
-                  className="w-full h-11 pl-4 pr-14 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0b1528]"
+                  className="w-full h-11 pl-4 pr-14 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#07152d]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500 hover:text-[#0b1528]"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500 hover:text-[#07152d]"
                 >
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
 
-            {/* Main CTA: Golden Yellow */}
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center justify-between text-xs pt-0.5">
+              <label htmlFor="auth-remember-me" className="flex items-center gap-2 cursor-pointer select-none text-slate-600 font-medium hover:text-slate-900 transition-colors">
+                <input
+                  id="auth-remember-me"
+                  name="rememberMe"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-[#07152d] accent-[#07152d] focus:ring-[#07152d] cursor-pointer"
+                />
+                <span>Remember me</span>
+              </label>
+            </div>
+
+            {/* Main CTA: Golden Yellow matching landing page theme */}
             <button
               type="submit"
               disabled={status.loading}
-              className="w-full h-11 bg-amber-400 hover:bg-amber-300 text-[#0b1528] font-bold rounded-lg transition-colors text-sm shadow-sm cursor-pointer disabled:opacity-60 mt-2"
+              className="w-full h-11 bg-[#ffc52c] hover:bg-[#ffd45c] text-[#07152d] font-bold rounded-lg transition-colors text-sm shadow-sm cursor-pointer disabled:opacity-60 mt-2"
             >
               {status.loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -161,8 +217,8 @@ export default function AuthPage() {
       </main>
 
       {/* Footer: Deep Navy */}
-      <footer className="bg-[#0b1528] text-slate-400 py-4 px-6 text-center text-xs border-t border-slate-800">
-        DKTE Society's Textile and Engineering Institute • Training & Placement Cell, Ichalkaranji
+      <footer className="border-t border-white/10 bg-[#07152d] py-4 px-6 text-center text-xs text-slate-400">
+        DKTE Society&apos;s Textile and Engineering Institute • Training & Placement Cell, Ichalkaranji
       </footer>
     </div>
   );
