@@ -7,17 +7,50 @@ const prisma = require("../prismaClient");
 const register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
-        
-        if (!name || !email || !password) {
+
+        // if (!name || !email || !password) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Name, email and password are required"
+        //     });
+        // }
+
+        if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
             return res.status(400).json({
                 success: false,
-                message: "Name, email and password are required"
+                message: "Name, email and password are required as strings"
+            });
+        }
+
+        const trimmedName = name.trim();
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (!trimmedName || trimmedName.length > 100) {
+            return res.status(400).json({
+                success: false,
+                message: "Name must be between 1 and 100 characters"
+            });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (normalizedEmail.length > 254 || !emailRegex.test(normalizedEmail)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid email address"
+            });
+        }
+
+        if (password.length < 8 || password.length > 72) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be between 8 and 72 characters"
             });
         }
 
         const existingUser = await prisma.user.findUnique({
             where: {
-                email: email
+                email: normalizedEmail
             }
         });
 
@@ -32,8 +65,8 @@ const register = async (req, res) => {
 
         const user = await prisma.user.create({
             data: {
-                name,
-                email,
+                name: trimmedName,
+                email: normalizedEmail,
                 password: hashedPassword,
                 role: role || "STUDENT"
             }
@@ -67,16 +100,23 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        if (!email || !password) {
+        if (
+            typeof email !== "string" ||
+            typeof password !== "string" ||
+            !email.trim() ||
+            !password
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Email and password are required"
+                message: "Valid email and password are required"
             });
         }
 
+        const normalizedEmail = email.trim().toLowerCase();
+
         const user = await prisma.user.findUnique({
             where: {
-                email: email
+                email: normalizedEmail
             }
         });
 
