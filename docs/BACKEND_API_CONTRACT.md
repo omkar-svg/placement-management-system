@@ -31,6 +31,41 @@
 
 ---
 
-## 5. Auth (`/api/auth`)
-* `POST /api/auth/login` ➔ Body: `{ email, password }` ➔ Returns `{ token, user }`.
-* `GET /api/auth/me` ➔ Current logged-in user session.
+## 5. Authentication (`/api/auth`)
+
+- `POST /api/auth/register` — Register a new student. **Body:** `{ name, email, password }` | **Success:** `201 Created`
+- `POST /api/auth/login` — Log in and receive a JWT token with user details. **Body:** `{ email, password }` | **Success:** `200 OK`
+- `GET /api/auth/me` — Get the authenticated user's details. **Auth:** `Bearer <token>` | **Success:** `200 OK`
+
+### Common Error Responses
+
+- `400 Bad Request` — Invalid or missing fields.
+- `401 Unauthorized` — Invalid credentials or token.
+- `404 Not Found` — User not found.
+- `409 Conflict` — Email already registered.
+- `500 Internal Server Error` — Unexpected server error.
+
+**Response format:** `{ "success": true/false, "message": "...", "data": {} }`
+
+**Note:** Public registration must assign `STUDENT`; users cannot self-assign `ADMIN` or `TPO`.
+
+---
+
+## 6. Placement Status (`/api/placements`)
+
+- `GET /api/placements` — List all placement statuses. **Access:** `ADMIN`, `TPO`.
+- `GET /api/placements/:id` — Get placement status details. **Access:** `ADMIN`, `TPO`, `STUDENT` (own record only).
+- `PUT /api/placements/:id` — Update placement status and remarks. **Access:** `ADMIN`, `TPO`.
+- `GET /api/placements/:id/history` — View placement status history. **Access:** `ADMIN`, `TPO`, `STUDENT` (own record only).
+
+**Valid statuses:** `ELIGIBLE`, `SHORTLISTED`, `INTERVIEW_SCHEDULED`, `SELECTED`, `REJECTED`, `OFFER_ACCEPTED`.
+
+**Response format:** `{ "success": true/false, "message": "...", "data": {} }`
+
+### Common Error Responses
+
+- `400 Bad Request` — Invalid placement ID or status.
+- `401 Unauthorized` — Missing or invalid token.
+- `403 Forbidden` — Access denied.
+- `404 Not Found` — Placement status not found.
+- `500 Internal Server Error` — Unexpected server error.
