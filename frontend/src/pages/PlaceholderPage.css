@@ -1,0 +1,13 @@
+.placeholder-page {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.placeholder-page h2 {
+  margin: 0 0 8px;
+  color: var(--color-text-primary);
+}
