@@ -1,6 +1,6 @@
-# Frontend Roadmap (Milestones) 🗺️
+# Project Roadmap 🗺️
 
-> Our 3 simple development phases. Pick tasks from the current phase on GitHub!
+> Our simple development phases. Pick tasks from the current phase on GitHub!
 
 ---
 
@@ -11,7 +11,7 @@
 
 ---
 
-## 🔌 Phase 2: Real Backend Integrations (Next Sprint)
+## 🔌 Phase 2: Core Features & Integrations (Next Sprint)
 * [ ] **Student Dashboard:** Hook up real profile, resume, and upcoming drives from `GET /api/dashboard/student`
 * [ ] **TPO Dashboard:** Hook up stats and drive metrics from `GET /api/dashboard/tpo`
 * [ ] **Company Directory:** Add, view, and delete recruiting partners from `/api/companies`
@@ -23,4 +23,4 @@
 ## 🎨 Phase 3: Polish & Exports
 * [ ] Fix landing page image jumping (CLS) & use local Rajwada campus photo
 * [ ] Export eligible students list to CSV / Excel
-* [ ] Mobile drawer polish
+* [ ] Mobile responsiveness polish
