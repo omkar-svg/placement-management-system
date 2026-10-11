@@ -1,14 +1,19 @@
 ### 📝 What did you do?
-<!-- 1-2 lines explaining your change (e.g. "Changed button size on login page" or "Added Student Card") -->
+<!-- 1-2 lines explaining your change (e.g. "Built Button component", "Added GET /api/drives endpoint", or "Updated Prisma schema") -->
 
 
-### 📸 Screenshot (if UI changed)
-<!-- Drag & drop a screenshot here so we can see how it looks! -->
+### 🔍 Proof / Preview
+<!-- Frontend: Drag & drop a screenshot of the UI -->
+<!-- Backend/Database: Paste a Postman screenshot, API response, or terminal output -->
 
 
 ---
 
+### 🛠️ Area
+- [ ] Frontend (React / Tailwind)
+- [ ] Backend (Node / Express)
+- [ ] Database (Prisma / MySQL)
+
 ### ✅ Quick Checks
-- [ ] No new `.css` files (used Tailwind CSS)
-- [ ] Ran `npm run build` and it works without errors
+- [ ] Tested locally and works without errors
 <!-- Optional: Closes #issue_number -->
