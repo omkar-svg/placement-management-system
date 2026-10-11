@@ -42,7 +42,9 @@ const getPlacementReportData = async () => {
   // 3. Fetch selected placement records in one query
   const selectedRecords = await prisma.placementStatus.findMany({
     where: {
-      status: "SELECTED",
+      status: {
+        in: ["SELECTED", "OFFER_ACCEPTED"],
+      },
     },
     select: {
       studentId: true,
@@ -73,7 +75,7 @@ const getPlacementReportData = async () => {
   const totalPlacedStudents = uniquePlacedStudents.size;
 
   const placementPercentage =
-    totalStudents > 0 ? ((totalPlacedStudents / totalStudents) * 100).toFixed(2) : 0;
+    totalStudents > 0 ? Number(((totalPlacedStudents / totalStudents) * 100).toFixed(2)) : 0;
 
   // 6. Prepare branch-wise statistics
   const branchPlacedStudents = new Map();
@@ -96,7 +98,7 @@ const getPlacementReportData = async () => {
       branch: item.branch,
       totalStudents: total,
       placedStudents: placed,
-      placementPercentage: total > 0 ? ((placed / total) * 100).toFixed(2) : 0,
+      placementPercentage: total > 0 ? Number(((placed / total) * 100).toFixed(2)) : 0,
     };
   });
 
@@ -144,7 +146,6 @@ const getPlacementAnalytics = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch placement analytics",
-      error: error.message,
     });
   }
 };
@@ -427,8 +428,6 @@ const exportPlacementPDF = async (req, res) => {
       success: false,
 
       message: "Failed to generate placement PDF",
-
-      error: error.message,
     });
   }
 };
@@ -678,7 +677,6 @@ const exportPlacementExcel = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to generate placement Excel",
-      error: error.message,
     });
   }
 };
