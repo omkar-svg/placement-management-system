@@ -4,9 +4,9 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const prisma = require("./prismaClient");
 
-
-const authRoutes = require("./routes/authRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
+const authRoutes = require('./routes/authRoutes');
+const driveRoutes = require('./routes/driveRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const placementRoutes = require("./routes/placementRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const driveRoutes = require("./routes/driveRoutes");
@@ -29,7 +29,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Health Check API ────────────────────────────────────
+// -- Health Check API ---------------------------------------------
 
 app.get("/api/health", async (req, res) => {
   const healthData = {
@@ -42,7 +42,6 @@ app.get("/api/health", async (req, res) => {
   };
 
   try {
-    // Test database connection with a simple query
     await prisma.$queryRaw`SELECT 1`;
     healthData.database = "connected";
   } catch (error) {
@@ -56,14 +55,12 @@ app.get("/api/health", async (req, res) => {
 });
 
 // Routes
-app.use("/api/auth", authRoutes);
-// app.use('/api/students', studentRoutes);
-
-
+app.use('/api/auth', authRoutes);
+app.use('/api/drives', driveRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use("/api/companies", companyRoutes);
-app.use("/api/drives", driveRoutes);
-app.use("/api/notifications", notificationRoutes);
-app.use("/api/placements", placementRoutes);
+app.use('/api/placements', placementRoutes);
+app.use("/api/companies", companyRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 const PORT = process.env.PORT || 5000;
