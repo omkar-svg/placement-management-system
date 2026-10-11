@@ -110,6 +110,9 @@ const getStudents = async (req, res) => {
                     prn: true,
                     branch: true,
                     year: true,
+                    graduationYear: true,
+                    tenthPercentage: true,
+                    twelfthPercentage: true,
                     cgpa: true,
                     activeBacklogs: true,
                     phone: true,
@@ -177,6 +180,9 @@ const createStudent = async (req, res) => {
             prn,
             branch,
             year,
+            graduationYear,
+            tenthPercentage,
+            twelfthPercentage,
             cgpa,
             activeBacklogs,
             phone,
@@ -238,18 +244,30 @@ const createStudent = async (req, res) => {
         const student = await prisma.student.create({
             data: {
                 userId: Number(userId),
-                prn,
-                branch,
-                year: Number(year),
-                cgpa: Number(cgpa),
-                activeBacklogs:
-                    activeBacklogs === undefined
-                        ? 0
-                        : Number(activeBacklogs),
-                phone,
-                linkedin,
-                github,
-                portfolio
+        prn,
+        branch,
+        year: Number(year),
+        graduationYear:
+            graduationYear === undefined || graduationYear === null || graduationYear === ""
+                ? null
+                : Number(graduationYear),
+        tenthPercentage:
+            tenthPercentage === undefined || tenthPercentage === null || tenthPercentage === ""
+                ? null
+                : Number(tenthPercentage),
+        twelfthPercentage:
+            twelfthPercentage === undefined || twelfthPercentage === null || twelfthPercentage === ""
+                ? null
+                : Number(twelfthPercentage),
+        cgpa: Number(cgpa),
+        activeBacklogs:
+            activeBacklogs === undefined
+                ? 0
+                : Number(activeBacklogs),
+        phone,
+        linkedin,
+        github,
+        portfolio
             },
             select: {
                 id: true,
@@ -257,6 +275,9 @@ const createStudent = async (req, res) => {
                 prn: true,
                 branch: true,
                 year: true,
+                graduationYear: true,
+                tenthPercentage: true,
+                twelfthPercentage: true,
                 cgpa: true,
                 activeBacklogs: true,
                 phone: true,
@@ -265,7 +286,7 @@ const createStudent = async (req, res) => {
                 portfolio: true,
                 profileCompleted: true,
                 createdAt: true,
-                updatedAt: true
+                updatedAt: true,
             }
         });
 
@@ -307,6 +328,9 @@ const getStudentById = async (req, res) => {
                 prn: true,
                 branch: true,
                 year: true,
+                graduationYear: true,
+                tenthPercentage: true,
+                twelfthPercentage: true,
                 cgpa: true,
                 activeBacklogs: true,
                 phone: true,
@@ -384,6 +408,9 @@ const updateStudent = async (req, res) => {
             prn,
             branch,
             year,
+            graduationYear,
+            tenthPercentage,
+            twelfthPercentage,
             cgpa,
             activeBacklogs,
             phone,
@@ -398,6 +425,27 @@ const updateStudent = async (req, res) => {
         if (prn !== undefined) updateData.prn = prn;
         if (branch !== undefined) updateData.branch = branch;
         if (year !== undefined) updateData.year = Number(year);
+        if (graduationYear !== undefined) {
+                updateData.graduationYear =
+                graduationYear === null || graduationYear === ""
+                ? null
+                : Number(graduationYear);
+                }
+
+            if (tenthPercentage !== undefined) {
+                updateData.tenthPercentage =
+                tenthPercentage === null || tenthPercentage === ""
+                ? null
+                : Number(tenthPercentage);
+            }
+
+            if (twelfthPercentage !== undefined) {
+                updateData.twelfthPercentage =
+                twelfthPercentage === null || twelfthPercentage === ""
+                ? null
+                : Number(twelfthPercentage);
+            }
+
         if (cgpa !== undefined) updateData.cgpa = Number(cgpa);
         if (activeBacklogs !== undefined) {
             updateData.activeBacklogs = Number(activeBacklogs);
@@ -426,6 +474,9 @@ const updateStudent = async (req, res) => {
                 prn: true,
                 branch: true,
                 year: true,
+                graduationYear: true,
+                tenthPercentage: true,
+                twelfthPercentage: true,
                 cgpa: true,
                 activeBacklogs: true,
                 phone: true,
