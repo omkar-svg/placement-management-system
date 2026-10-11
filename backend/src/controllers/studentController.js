@@ -36,15 +36,30 @@ const getStudents = async (req, res) => {
             });
         }
 
-        // Validate minimum CGPA.
-        if (
-            minCgpa !== undefined &&
-            !Number.isFinite(Number(minCgpa))
-        ) {
+        // Enforce maximum pagination limit
+        if (limitNumber > 100) {
             return res.status(400).json({
                 success: false,
-                message: "minCgpa must be a valid number"
+                message: "Limit cannot exceed 100"
             });
+        }
+
+        // Validate minimum CGPA (0–10 scale).
+        if (minCgpa !== undefined) {
+            const minCgpaNumber = Number(minCgpa);
+
+            if (
+                typeof minCgpa !== "string" ||
+                minCgpa.trim() === "" ||
+                !Number.isFinite(minCgpaNumber) ||
+                minCgpaNumber < 0 ||
+                minCgpaNumber > 10
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "minCgpa must be a number between 0 and 10"
+                });
+            }
         }
 
         const where = {};
@@ -164,6 +179,8 @@ const getStudents = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error("Error fetching students:", error);
+
         return res.status(500).json({
             success: false,
             message: "Server error"
@@ -193,16 +210,92 @@ const createStudent = async (req, res) => {
 
         if (
             userId === undefined ||
-            !prn ||
-            !branch ||
+            typeof prn !== "string" ||
+            !prn.trim() ||
+            typeof branch !== "string" ||
+            !branch.trim() ||
             year === undefined ||
             cgpa === undefined ||
-            !phone
+            typeof phone !== "string" ||
+            !phone.trim()
         ) {
             return res.status(400).json({
                 success: false,
                 message: "userId, prn, branch, year, cgpa and phone are required"
             });
+        }
+
+        const parsedUserId = Number(userId);
+        const parsedYear = Number(year);
+        const parsedCgpa = Number(cgpa);
+        const parsedBacklogs =
+            activeBacklogs === undefined || activeBacklogs === ""
+                ? 0
+                : Number(activeBacklogs);
+
+        if (!Number.isInteger(parsedUserId) || parsedUserId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "userId must be a positive integer"
+            });
+        }
+
+        if (!Number.isInteger(parsedYear) || parsedYear <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Year must be a positive integer"
+            });
+        }
+
+        if (!Number.isFinite(parsedCgpa) || parsedCgpa < 0 || parsedCgpa > 10) {
+            return res.status(400).json({
+                success: false,
+                message: "CGPA must be between 0 and 10"
+            });
+        }
+
+        if (!Number.isInteger(parsedBacklogs) || parsedBacklogs < 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Active backlogs must be a non-negative integer"
+            });
+        }
+
+        for (const [field, value] of [
+            ["graduationYear", graduationYear],
+            ["tenthPercentage", tenthPercentage],
+            ["twelfthPercentage", twelfthPercentage]
+        ]) {
+            if (value !== undefined && value !== null && value !== "") {
+                const number = Number(value);
+
+                if (!Number.isFinite(number)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `${field} must be a valid number`
+                    });
+                }
+
+                if (
+                    field === "graduationYear" &&
+                    (!Number.isInteger(number) || number <= 0)
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Graduation year must be a positive integer"
+                    });
+                }
+
+                if (
+                    field !== "graduationYear" &&
+                    (number < 0 || number > 100)
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `${field} must be between 0 and 100`
+                    });
+                }
+            }
         }
 
         const user = await prisma.user.findUnique({
@@ -242,11 +335,11 @@ const createStudent = async (req, res) => {
         }
 
         const student = await prisma.student.create({
-            data: {
-                userId: Number(userId),
+        data: {
+        userId: parsedUserId,
         prn,
         branch,
-        year: Number(year),
+        year: parsedYear,
         graduationYear:
             graduationYear === undefined || graduationYear === null || graduationYear === ""
                 ? null
@@ -259,11 +352,8 @@ const createStudent = async (req, res) => {
             twelfthPercentage === undefined || twelfthPercentage === null || twelfthPercentage === ""
                 ? null
                 : Number(twelfthPercentage),
-        cgpa: Number(cgpa),
-        activeBacklogs:
-            activeBacklogs === undefined
-                ? 0
-                : Number(activeBacklogs),
+        cgpa: parsedCgpa,
+        activeBacklogs: parsedBacklogs,
         phone,
         linkedin,
         github,
@@ -296,9 +386,18 @@ const createStudent = async (req, res) => {
             data: student
         });
     } catch (error) {
+        console.error("Error creating student:", error);
+
+        if (error.code === "P2002") {
+            return res.status(409).json({
+                success: false,
+                message: "A student profile with this user ID or PRN already exists"
+            });
+        }
+
         return res.status(500).json({
             success: false,
-            message: "Server error"
+            message: "Internal server error while creating student"
         });
     }
 };
@@ -363,12 +462,26 @@ const getStudentById = async (req, res) => {
             });
         }
 
+        // Students can access only their own profile
+        if (
+            req.user.role === "STUDENT" &&
+            student.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to access this student profile"
+            });
+        }
+
         return res.status(200).json({
             success: true,
             message: "Student fetched successfully",
             data: student
         });
+
     } catch (error) {
+        console.error("Error fetching student by ID:", error);
+
         return res.status(500).json({
             success: false,
             message: "Server error"
@@ -382,25 +495,32 @@ const updateStudent = async (req, res) => {
     try {
         const studentId = Number(req.params.id);
 
-        // Validate the student ID
-        if (!Number.isInteger(studentId) || studentId < 1) {
+        if (!Number.isInteger(studentId) || studentId <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid student ID"
             });
         }
 
-        // Check whether the student exists
         const existingStudent = await prisma.student.findUnique({
-            where: {
-                id: studentId
-            }
+            where: { id: studentId }
         });
 
         if (!existingStudent) {
             return res.status(404).json({
                 success: false,
                 message: "Student not found"
+            });
+        }
+
+        // Students can update only their own profile
+        if (
+            req.user.role === "STUDENT" &&
+            existingStudent.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to update this student profile"
             });
         }
 
@@ -419,54 +539,137 @@ const updateStudent = async (req, res) => {
             portfolio
         } = req.body;
 
-        // Build update data using only fields provided by the client
         const updateData = {};
 
-        if (prn !== undefined) updateData.prn = prn;
-        if (branch !== undefined) updateData.branch = branch;
-        if (year !== undefined) updateData.year = Number(year);
-        if (graduationYear !== undefined) {
-                updateData.graduationYear =
-                graduationYear === null || graduationYear === ""
-                ? null
-                : Number(graduationYear);
-                }
-
-            if (tenthPercentage !== undefined) {
-                updateData.tenthPercentage =
-                tenthPercentage === null || tenthPercentage === ""
-                ? null
-                : Number(tenthPercentage);
-            }
-
-            if (twelfthPercentage !== undefined) {
-                updateData.twelfthPercentage =
-                twelfthPercentage === null || twelfthPercentage === ""
-                ? null
-                : Number(twelfthPercentage);
-            }
-
-        if (cgpa !== undefined) updateData.cgpa = Number(cgpa);
-        if (activeBacklogs !== undefined) {
-            updateData.activeBacklogs = Number(activeBacklogs);
+        if (prn !== undefined) {
+        if (typeof prn !== "string" || !prn.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "PRN must be a non-empty string"
+            });
         }
-        if (phone !== undefined) updateData.phone = phone;
-        if (linkedin !== undefined) updateData.linkedin = linkedin;
-        if (github !== undefined) updateData.github = github;
-        if (portfolio !== undefined) updateData.portfolio = portfolio;
+        updateData.prn = prn.trim();
+        }
 
-        // Check that at least one field is provided
+        if (branch !== undefined) {
+            if (typeof branch !== "string" || !branch.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Branch must be a non-empty string"
+                });
+            }
+        updateData.branch = branch.trim();
+        }
+
+        if (phone !== undefined) {
+            if (typeof phone !== "string" || !phone.trim()) {
+                return res.status(400).json({
+                success: false,
+                message: "Phone must be a non-empty string"
+                });
+            }
+        updateData.phone = phone.trim();
+        }
+
+        for (const [field, value] of [
+        ["linkedin", linkedin],
+        ["github", github],
+        ["portfolio", portfolio]
+        ]) {
+            if (value !== undefined) {
+            if (value !== null && typeof value !== "string") {
+                return res.status(400).json({
+                    success: false,
+                    message: `${field} must be a string or null`
+                });
+            }
+
+            updateData[field] =
+                typeof value === "string" && value.trim() === ""
+                    ? null
+                    : typeof value === "string"
+                        ? value.trim()
+                        : value;
+            }
+        }
+
+        if (year !== undefined) {
+            const value = Number(year);
+            if (!Number.isInteger(value) || value <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Year must be a positive integer"
+                });
+            }
+            updateData.year = value;
+        }
+
+        if (graduationYear !== undefined) {
+            if (graduationYear === null || graduationYear === "") {
+                updateData.graduationYear = null;
+            } else {
+                const value = Number(graduationYear);
+                if (!Number.isInteger(value) || value <= 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Graduation year must be a positive integer or null"
+                    });
+                }
+                updateData.graduationYear = value;
+            }
+        }
+
+        for (const [field, value] of [
+            ["tenthPercentage", tenthPercentage],
+            ["twelfthPercentage", twelfthPercentage]
+        ]) {
+            if (value !== undefined) {
+                if (value === null || value === "") {
+                    updateData[field] = null;
+                } else {
+                    const number = Number(value);
+                    if (!Number.isFinite(number) || number < 0 || number > 100) {
+                        return res.status(400).json({
+                            success: false,
+                            message: `${field} must be between 0 and 100, or null`
+                        });
+                    }
+                    updateData[field] = number;
+                }
+            }
+        }
+
+        if (cgpa !== undefined) {
+            const value = Number(cgpa);
+            if (!Number.isFinite(value) || value < 0 || value > 10) {
+                return res.status(400).json({
+                    success: false,
+                    message: "CGPA must be between 0 and 10"
+                });
+            }
+            updateData.cgpa = value;
+        }
+
+        if (activeBacklogs !== undefined) {
+            const value = Number(activeBacklogs);
+            if (!Number.isInteger(value) || value < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Active backlogs must be a non-negative integer"
+                });
+            }
+            updateData.activeBacklogs = value;
+        }
+
         if (Object.keys(updateData).length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "At least one field is required to update"
+                message: "No valid fields provided for update"
             });
         }
 
         const updatedStudent = await prisma.student.update({
-            where: {
-                id: studentId
-            },
+            where: { id: studentId },
             data: updateData,
             select: {
                 id: true,
@@ -483,8 +686,6 @@ const updateStudent = async (req, res) => {
                 linkedin: true,
                 github: true,
                 portfolio: true,
-                profileCompleted: true,
-                createdAt: true,
                 updatedAt: true
             }
         });
@@ -495,9 +696,25 @@ const updateStudent = async (req, res) => {
             data: updatedStudent
         });
     } catch (error) {
+        console.error("Error updating student:", error);
+
+        if (error.code === "P2002") {
+            return res.status(409).json({
+                success: false,
+                message: "PRN already exists"
+            });
+        }
+
+        if (error.code === "P2025") {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
         return res.status(500).json({
             success: false,
-            message: "Server error"
+            message: "Internal server error while updating student"
         });
     }
 };
@@ -529,6 +746,17 @@ const deleteStudent = async (req, res) => {
             });
         }
 
+        // Students can delete only their own profile
+        if (
+            req.user.role === "STUDENT" &&
+            existingStudent.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+            success: false,
+            message: "You are not authorized to delete this student profile"
+            });
+        }
+
         // Delete the student profile
         await prisma.student.delete({
             where: {
@@ -541,6 +769,8 @@ const deleteStudent = async (req, res) => {
             message: "Student deleted successfully"
         });
     } catch (error) {
+        console.error("Error deleting student:", error);
+        
         return res.status(500).json({
             success: false,
             message: "Server error"
@@ -584,6 +814,18 @@ const addStudentSkill = async (req, res) => {
             });
         }
 
+
+        // Students can add skills only to their own profile
+        if (
+            req.user.role === "STUDENT" &&
+            student.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+            success: false,
+            message: "You are not authorized to add skills to this student profile"
+            });
+        }
+
         const trimmedSkillName = skillName.trim();
 
         // Check whether the student already has this skill
@@ -614,10 +856,19 @@ const addStudentSkill = async (req, res) => {
             message: "Student skill added successfully",
             data: skill
         });
-    } catch (error) {
-        return res.status(500).json({
+        } catch (error) {
+        console.error("Error adding student skill:", error);
+
+        if (error.code === "P2002") {
+        return res.status(409).json({
             success: false,
-            message: "Server error"
+            message: "Skill already exists for this student"
+            });
+        }
+
+        return res.status(500).json({
+        success: false,
+        message: "Server error"
         });
     }
 };
@@ -658,6 +909,17 @@ const deleteStudentSkill = async (req, res) => {
             });
         }
 
+        // Students can delete skills only from their own profile
+        if (
+            req.user.role === "STUDENT" &&
+            student.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+            success: false,
+            message: "You are not authorized to delete skills from this student profile"
+            });
+        }
+
         // Check whether the skill belongs to this student
         const skill = await prisma.studentSkill.findFirst({
             where: {
@@ -685,6 +947,8 @@ const deleteStudentSkill = async (req, res) => {
             message: "Student skill deleted successfully"
         });
     } catch (error) {
+        console.error("Error deleting student skill:", error);
+
         return res.status(500).json({
             success: false,
             message: "Server error"
@@ -720,6 +984,17 @@ const uploadStudentResume = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Student not found"
+            });
+        }
+
+        // Students can upload resumes only to their own profile
+        if (
+            req.user.role === "STUDENT" &&
+            student.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+            success: false,
+            message: "You are not authorized to upload a resume for this student"
             });
         }
 
@@ -763,7 +1038,11 @@ const uploadStudentResume = async (req, res) => {
                 );
 
                 if (fs.existsSync(oldFilePath)) {
+                    try {
                     fs.unlinkSync(oldFilePath);
+                    } catch (fileError) {
+                        console.error("Error deleting old resume file:", fileError);
+                    }
                 }
             }
         } else {
@@ -784,6 +1063,8 @@ const uploadStudentResume = async (req, res) => {
             data: resume
         });
     } catch (error) {
+        console.error("Error uploading student resume:", error);
+
         return res.status(500).json({
             success: false,
             message: "Server error"
@@ -819,6 +1100,17 @@ const getStudentResume = async (req, res) => {
             });
         }
 
+        // Students can access only their own resume
+        if (
+            req.user.role === "STUDENT" &&
+            student.userId !== req.user.id
+        ) {
+            return res.status(403).json({
+            success: false,
+            message: "You are not authorized to access this student's resume"
+            });
+        }
+
         // Find the student's resume
         const resume = await prisma.resume.findUnique({
             where: {
@@ -839,6 +1131,8 @@ const getStudentResume = async (req, res) => {
             data: resume
         });
     } catch (error) {
+        console.error("Error fetching student resume:", error);
+
         return res.status(500).json({
             success: false,
             message: "Server error"
