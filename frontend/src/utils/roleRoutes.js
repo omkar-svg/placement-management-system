@@ -6,8 +6,9 @@ export function getHomePath(role) {
       return '/admin-dashboard';
     case 'STUDENT':
       return '/student/dashboard';
+    case 'TPO':
+      return '/tpo/dashboard';
     default:
-      // TPO has no dashboard in this frontend yet.
       return '/';
   }
 }
