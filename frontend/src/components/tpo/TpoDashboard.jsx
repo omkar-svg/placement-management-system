@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from "react";
-import api from "../../services/api";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
     FiUsers,
     FiBriefcase,
@@ -10,11 +10,13 @@ import {
     FiArrowUpRight,
     FiCalendar,
     FiBell,
-    FiSearch,
     FiMapPin,
     FiLogOut,
+    FiRefreshCw,
+    FiAlertCircle,
 } from "react-icons/fi";
-import { Link } from "react-router-dom";
+
+import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
@@ -33,115 +35,120 @@ const statsConfig = [
         key: "totalStudents",
         icon: FiUsers,
         color: "bg-blue-50 text-blue-700",
+        description: "Registered student profiles",
     },
     {
-        label: "Companies",
+        label: "Total Companies",
         key: "totalCompanies",
         icon: FiBriefcase,
         color: "bg-amber-50 text-amber-700",
+        description: "Companies in the system",
     },
     {
         label: "Placement Drives",
         key: "totalDrives",
         icon: FiTarget,
         color: "bg-purple-50 text-purple-700",
+        description: "Total recruitment drives",
     },
     {
         label: "Students Placed",
         key: "totalPlaced",
         icon: FiTrendingUp,
         color: "bg-emerald-50 text-emerald-700",
+        description: "Selected or accepted offers",
     },
 ];
 
+function formatDate(date) {
+    if (!date) return "Date not set";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "Date not set";
+    }
+
+    return parsedDate.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+}
+
+function getStatusStyle(status) {
+    switch (status) {
+        case "ONGOING":
+            return "bg-emerald-50 text-emerald-700";
+        case "COMPLETED":
+            return "bg-slate-100 text-slate-600";
+        default:
+            return "bg-blue-50 text-blue-700";
+    }
+}
+
 function TpoDashboard() {
     const { logout } = useAuth();
-    const [dashboard, setDashboard] = useState({});
+
+    const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        let active = true;
+    const loadDashboard = useCallback(async () => {
+        setLoading(true);
+        setError("");
 
-        async function loadDashboard() {
-            try {
-                const response = await api.get("/dashboard/tpo");
-                if (active) {
-                    setDashboard(response.data?.data ?? response.data ?? {});
-                    setError("");
-                }
-            } catch {
-                if (active) {
-                    setError("Unable to load dashboard. Check your backend connection.");
-                }
-            } finally {
-                if (active) setLoading(false);
+        try {
+            // Existing Axios service attaches the JWT automatically.
+            const response = await api.get("/dashboard/tpo");
+
+            // Backend format: { success, message, data }
+            const result = response.data?.data;
+
+            if (response.data?.success === false || !result) {
+                throw new Error(
+                    response.data?.message || "Invalid dashboard response."
+                );
             }
+
+            setDashboard(result);
+        } catch (err) {
+            console.error("Failed to load TPO dashboard:", err);
+
+            setError(
+                err.response?.data?.message ||
+                err.message ||
+                "Unable to load dashboard. Check the backend connection."
+            );
+        } finally {
+            setLoading(false);
         }
-
-        loadDashboard();
-
-        return () => {
-            active = false;
-        };
     }, []);
 
+    useEffect(() => {
+        loadDashboard();
+    }, [loadDashboard]);
+
+    // Map the API response to the four statistic cards.
     const stats = statsConfig.map((item) => ({
         ...item,
-        value: dashboard[item.key] ?? 0,
+        value:
+            item.key === "totalPlaced"
+                ? dashboard?.placementStats?.totalPlaced ?? 0
+                : dashboard?.[item.key] ?? 0,
     }));
 
-    const drives = dashboard.drives ?? [];
+    // Correct property returned by GET /api/dashboard/tpo.
+    const drives = dashboard?.upcomingOngoingDrives ?? [];
+
+    const notifications = dashboard?.recentNotifications ?? [];
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-800 md:flex">
             {/* Sidebar */}
-            <aside className="w-full shrink-0 bg-[#0b1f3a] text-white md:min-h-screen md:w-64">
-                <div className="border-b border-white/10 px-6 py-6">
-                    <h2 className="text-xl font-extrabold tracking-wide">
-                        DKTE <span className="text-[#ffc52c]">PLACEMENTS</span>
-                    </h2>
-                    <p className="mt-1 text-xs text-slate-400">
-                        Training & Placement Portal
-                    </p>
-                </div>
+            
 
-                <nav className="flex gap-2 overflow-x-auto p-4 md:block md:space-y-2">
-                    {navItems.map((item, index) => (
-                        <Link
-                            key={item.label}
-                            to={item.href}
-                            className={`flex shrink-0 items-center gap-3 rounded-lg px-4 py-3 text-sm transition ${index === 0
-                                    ? "bg-[#ffc52c] font-bold text-[#07152d]"
-                                    : "text-slate-300 hover:bg-white/10 hover:text-white"
-                                }`}
-                        >
-                            <span className="text-lg">{item.icon}</span>
-                            {item.label}
-                        </Link>
-                    ))}
-                </nav>
-
-                <div className="m-4 hidden rounded-xl border border-white/10 bg-white/5 p-4 md:block">
-                    <p className="text-sm font-semibold text-[#ffc52c]">
-                        Placement Office
-                    </p>
-                    <p className="mt-2 text-xs leading-5 text-slate-300">
-                        Manage recruitment drives, student eligibility and placement
-                        progress from one place.
-                    </p>
-                </div>
-                <button
-                    type="button"
-                    onClick={logout}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#0b1f3a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#17365f]"
-                >
-                    <FiLogOut size={17} aria-hidden="true" />
-                    Logout
-                </button>
-            </aside>
-
-            {/* Main content */}
+            {/* Main dashboard */}
             <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
                 {/* Header */}
                 <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
@@ -160,11 +167,23 @@ function TpoDashboard() {
                     <div className="flex items-center gap-3">
                         <button
                             type="button"
-                            aria-label="Notifications"
+                            onClick={loadDashboard}
+                            disabled={loading}
+                            title="Refresh dashboard"
+                            aria-label="Refresh dashboard"
+                            className="rounded-xl border border-slate-200 bg-white p-3 text-slate-600 transition hover:bg-slate-100 disabled:opacity-50"
+                        >
+                            <FiRefreshCw className={loading ? "animate-spin" : ""} />
+                        </button>
+
+                        <Link
+                            to="/tpo/notifications"
+                            aria-label="View notifications"
                             className="rounded-xl border border-slate-200 bg-white p-3 text-slate-600 hover:bg-slate-100"
                         >
                             <FiBell size={19} />
-                        </button>
+                        </Link>
+
                         <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2 pr-4">
                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0b1f3a] font-bold text-[#ffc52c]">
                                 TPO
@@ -176,7 +195,6 @@ function TpoDashboard() {
                                 <p className="text-xs text-slate-500">TPO Account</p>
                             </div>
                         </div>
-
                     </div>
                 </header>
 
@@ -186,9 +204,11 @@ function TpoDashboard() {
                         <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-[#ffc52c]">
                             PLACEMENT MANAGEMENT
                         </span>
+
                         <h2 className="mt-4 text-2xl font-bold sm:text-3xl">
                             Build successful careers.
                         </h2>
+
                         <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
                             Track students, coordinate companies and manage campus
                             recruitment from a single dashboard.
@@ -204,53 +224,63 @@ function TpoDashboard() {
                     </Link>
                 </section>
 
-                {/* Error / loading */}
+                {/* API error */}
                 {error && (
                     <div
                         role="alert"
-                        className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
+                        className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
                     >
-                        {error}
+                        <div className="flex items-center gap-2">
+                            <FiAlertCircle size={19} />
+                            <span>{error}</span>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={loadDashboard}
+                            className="font-bold underline"
+                        >
+                            Retry
+                        </button>
                     </div>
                 )}
 
-                {loading && (
-                    <p className="mb-6 text-sm text-slate-500">
-                        Loading placement statistics...
-                    </p>
-                )}
-
-                {/* Statistics */}
-                <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {/* Four live statistics */}
+                <section
+                    aria-label="Placement statistics"
+                    className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                >
                     {stats.map((stat) => {
                         const Icon = stat.icon;
 
                         return (
-                            <div
-                                key={stat.label}
-                                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                            <article
+                                key={stat.key}
+                                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                             >
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between gap-3">
                                     <span className="text-sm font-medium text-slate-500">
                                         {stat.label}
                                     </span>
+
                                     <span className={`rounded-xl p-3 ${stat.color}`}>
                                         <Icon size={21} />
                                     </span>
                                 </div>
 
                                 <p className="mt-4 text-3xl font-extrabold text-[#0b1f3a]">
-                                    {loading ? "—" : stat.value}
+                                    {loading ? "—" : stat.value.toLocaleString("en-IN")}
                                 </p>
+
                                 <p className="mt-2 text-xs text-slate-500">
-                                    Live placement overview
+                                    {stat.description}
                                 </p>
-                            </div>
+                            </article>
                         );
                     })}
                 </section>
 
-                {/* Drives and quick actions */}
+                {/* Drive list and quick actions */}
                 <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
                     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
                         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -259,7 +289,7 @@ function TpoDashboard() {
                                     Placement Drives
                                 </h3>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Review scheduled recruitment activities.
+                                    Review upcoming and ongoing recruitment activities.
                                 </p>
                             </div>
 
@@ -271,54 +301,63 @@ function TpoDashboard() {
                             </Link>
                         </div>
 
-                        {drives.length === 0 ? (
+                        {loading ? (
+                            <div className="py-12 text-center text-sm text-slate-500">
+                                Loading placement drives...
+                            </div>
+                        ) : drives.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-slate-300 py-12 text-center">
                                 <FiCalendar className="mx-auto text-3xl text-slate-400" />
                                 <p className="mt-3 font-semibold text-slate-700">
                                     No placement drives available
                                 </p>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Drives returned by your backend will appear here.
+                                    Create a drive to get started.
                                 </p>
-                                <Link
-                                    to="/tpo/drives/new"
-                                    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#ffc52c] px-4 py-2 text-sm font-bold text-[#07152d]"
-                                >
-                                    <FiPlus /> Add a drive
-                                </Link>
                             </div>
                         ) : (
                             <div className="space-y-3">
                                 {drives.map((drive) => (
-                                    <div
+                                    <article
                                         key={drive.id}
-                                        className="flex flex-col justify-between gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center"
+                                        className="flex flex-col justify-between gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-slate-300 sm:flex-row sm:items-center"
                                     >
-                                        <div>
+                                        <div className="min-w-0">
                                             <h4 className="font-bold text-[#0b1f3a]">
                                                 {drive.role}
                                             </h4>
+
                                             <p className="mt-1 text-sm text-slate-500">
-                                                {drive.company?.companyName ?? drive.companyName ?? "Company"}
+                                                {drive.company?.companyName ?? "Company"}
                                             </p>
-                                            <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-                                                <FiCalendar />
-                                                {drive.driveDate
-                                                    ? new Date(drive.driveDate).toLocaleDateString()
-                                                    : "Date not set"}
-                                                <FiMapPin />
-                                                {drive.venue ?? "Venue not set"}
-                                            </p>
+
+                                            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-500">
+                                                <span className="flex items-center gap-1">
+                                                    <FiCalendar />
+                                                    {formatDate(drive.driveDate)}
+                                                </span>
+
+                                                <span className="flex items-center gap-1">
+                                                    <FiMapPin />
+                                                    {drive.venue || drive.company?.location || "Venue not set"}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                                                {drive.status ?? "UPCOMING"}
+
+                                        <div className="flex shrink-0 items-center gap-3">
+                                            <span
+                                                className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusStyle(
+                                                    drive.status
+                                                )}`}
+                                            >
+                                                {drive.status || "UPCOMING"}
                                             </span>
+
                                             <span className="font-bold text-[#0b1f3a]">
-                                                {drive.package ?? "—"}
+                                                {drive.package || "—"}
                                             </span>
                                         </div>
-                                    </div>
+                                    </article>
                                 ))}
                             </div>
                         )}
@@ -329,6 +368,7 @@ function TpoDashboard() {
                         <h3 className="text-lg font-bold text-[#0b1f3a]">
                             Quick Actions
                         </h3>
+
                         <p className="mt-1 text-sm text-slate-500">
                             Common placement tasks.
                         </p>
@@ -383,10 +423,70 @@ function TpoDashboard() {
                                         Track student applications
                                     </p>
                                 </div>
-                                <FiSearch />
+                                <FiTarget />
                             </Link>
                         </div>
                     </div>
+                </section>
+
+                {/* Recent notifications */}
+                <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                            <h3 className="text-lg font-bold text-[#0b1f3a]">
+                                Recent Notifications
+                            </h3>
+                            <p className="mt-1 text-sm text-slate-500">
+                                Latest updates for your TPO account.
+                            </p>
+                        </div>
+
+                        <Link
+                            to="/tpo/notifications"
+                            className="text-sm font-bold text-[#0b1f3a] hover:text-blue-700"
+                        >
+                            View all
+                        </Link>
+                    </div>
+
+                    {loading ? (
+                        <p className="py-4 text-sm text-slate-500">
+                            Loading notifications...
+                        </p>
+                    ) : notifications.length === 0 ? (
+                        <p className="py-6 text-center text-sm text-slate-500">
+                            No recent notifications.
+                        </p>
+                    ) : (
+                        <div className="divide-y divide-slate-100">
+                            {notifications.map((notification) => (
+                                <div
+                                    key={notification.id}
+                                    className="flex items-start gap-3 py-4"
+                                >
+                                    <span className="rounded-lg bg-amber-50 p-2 text-amber-700">
+                                        <FiBell size={17} />
+                                    </span>
+
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-sm font-semibold text-[#0b1f3a]">
+                                            {notification.title}
+                                        </p>
+                                        <p className="mt-1 text-sm text-slate-500">
+                                            {notification.message}
+                                        </p>
+                                        <p className="mt-2 text-xs text-slate-400">
+                                            {formatDate(notification.createdAt)}
+                                        </p>
+                                    </div>
+
+                                    {!notification.isRead && (
+                                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#ffc52c]" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </section>
 
                 <footer className="mt-8 border-t border-slate-200 py-5 text-center text-xs text-slate-500">
