@@ -9,6 +9,7 @@ import TpoDashboard from "./components/tpo/TpoDashboard";
 
 import AutoAdminAccess from './components/auth/AutoAdminAccess.jsx';
 import Logout from './components/auth/Logout.jsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 
 // --- Admin pages ---
 // Lazy-loaded: these pull in recharts and the rest of the admin bundle,
@@ -50,7 +51,14 @@ const adminOnly = (page) => (
 function App() {
   return (
     <Routes>
-      <Route path="/tpo/dashboard" element={<TpoDashboard />} />
+      <Route
+        path="/tpo/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['TPO']}>
+            <TpoDashboard />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<Navigate to="/login" replace />} />
