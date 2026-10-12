@@ -1,16 +1,15 @@
+﻿import { useEffect, useId } from "react";
 
-import { useEffect, useId } from "react";
-
-const Modal = ({
+export default function Modal({
   isOpen,
   onClose,
-  title,
+  title = "Confirmation",
   children,
   onCancel,
   onConfirm,
   cancelText = "Cancel",
   confirmText = "Confirm",
-}) => {
+}) {
   const titleId = useId();
 
   useEffect(() => {
@@ -39,21 +38,22 @@ const Modal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center
-        overflow-y-auto bg-slate-900/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center
+        justify-center overflow-y-auto bg-slate-900/50
+        p-4 backdrop-blur-sm"
       onMouseDown={handleBackdropClick}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative my-auto w-full max-w-lg rounded-xl
-          bg-white p-6 shadow-xl"
+        className="my-auto w-full max-w-lg rounded-2xl
+          bg-white p-6 shadow-2xl ring-1 ring-black/10"
       >
-        <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="mb-5 flex items-center justify-between gap-4">
           <h2
             id={titleId}
-            className="text-xl font-semibold text-slate-900"
+            className="text-xl font-bold text-slate-900"
           >
             {title}
           </h2>
@@ -62,26 +62,27 @@ const Modal = ({
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="rounded-lg px-3 py-1 text-2xl text-slate-500
+            className="flex h-9 w-9 items-center justify-center
+              rounded-full text-2xl text-slate-500
               transition hover:bg-slate-100 hover:text-slate-900"
           >
             &times;
           </button>
         </div>
 
-        <div className="text-slate-600">
+        <div className="text-sm leading-6 text-slate-600">
           {children}
         </div>
 
         {(onCancel || onConfirm) && (
-          <div className="mt-6 flex flex-wrap justify-end gap-3">
+          <div className="mt-7 flex flex-wrap justify-end gap-3">
             {onCancel && (
               <button
                 type="button"
                 onClick={onCancel}
                 className="rounded-lg border border-slate-300
-                  px-4 py-2 text-slate-700 transition
-                  hover:bg-slate-100"
+                  px-5 py-2.5 font-medium text-slate-700
+                  transition hover:bg-slate-100"
               >
                 {cancelText}
               </button>
@@ -91,8 +92,11 @@ const Modal = ({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="rounded-lg bg-blue-600 px-4 py-2
-                  text-white transition hover:bg-blue-700"
+                className="rounded-lg bg-blue-600 px-5 py-2.5
+                  font-medium text-white shadow-sm transition
+                  hover:bg-blue-700 focus:outline-none
+                  focus:ring-2 focus:ring-blue-500
+                  focus:ring-offset-2"
               >
                 {confirmText}
               </button>
@@ -102,6 +106,5 @@ const Modal = ({
       </div>
     </div>
   );
-};
-
-export default Modal;
+}
+```
