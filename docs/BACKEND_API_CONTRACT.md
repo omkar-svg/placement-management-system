@@ -1,6 +1,8 @@
 # Backend API Cheat-Sheet 🔌
 
-> Real backend endpoints ready to use right now. Base URL: `/api`
+> **Base URL:** `/api`  
+> *For Frontend:* Real endpoints ready to use right now.  
+> *For Backend:* When you add a new endpoint, append it to this list in your PR!  
 
 ---
 
