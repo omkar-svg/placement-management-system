@@ -5,6 +5,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import StudentDashboard from './pages/StudentDashboard.jsx';
+import TpoDashboard from "./components/tpo/TpoDashboard";
 
 import AutoAdminAccess from './components/auth/AutoAdminAccess.jsx';
 import Logout from './components/auth/Logout.jsx';
@@ -49,6 +50,7 @@ const adminOnly = (page) => (
 function App() {
   return (
     <Routes>
+      <Route path="/tpo/dashboard" element={<TpoDashboard />} />
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<Navigate to="/login" replace />} />
