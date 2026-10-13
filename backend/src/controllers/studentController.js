@@ -225,6 +225,36 @@ const createStudent = async (req, res) => {
             });
         }
 
+        
+        // Validate optional profile links and normalize blank strings to null.
+        const optionalLinks = {};
+
+        for (const field of ["linkedin", "github", "portfolio"]) {
+            const value = req.body[field];
+
+            if (
+                value !== undefined &&
+                value !== null &&
+                typeof value !== "string"
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: `${field} must be a string or null`
+                });
+            }
+
+            optionalLinks[field] =
+                typeof value === "string"
+                    ? value.trim() || null
+                    : value ?? null;
+        }
+
+        // Normalize required string fields before database operations.
+        const normalizedPrn = prn.trim();
+        const normalizedBranch = branch.trim();
+        const normalizedPhone = phone.trim();
+
+
         const parsedUserId = Number(userId);
         const parsedYear = Number(year);
         const parsedCgpa = Number(cgpa);
@@ -262,41 +292,64 @@ const createStudent = async (req, res) => {
         }
 
         for (const [field, value] of [
-            ["graduationYear", graduationYear],
-            ["tenthPercentage", tenthPercentage],
-            ["twelfthPercentage", twelfthPercentage]
+        ["graduationYear", graduationYear],
+        ["tenthPercentage", tenthPercentage],
+        ["twelfthPercentage", twelfthPercentage]
         ]) {
-            if (value !== undefined && value !== null && value !== "") {
-                const number = Number(value);
-
-                if (!Number.isFinite(number)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: `${field} must be a valid number`
-                    });
-                }
-
-                if (
-                    field === "graduationYear" &&
-                    (!Number.isInteger(number) || number <= 0)
-                ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Graduation year must be a positive integer"
-                    });
-                }
-
-                if (
-                    field !== "graduationYear" &&
-                    (number < 0 || number > 100)
-                ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: `${field} must be between 0 and 100`
-                    });
-                }
-            }
+         // Optional fields may be omitted, null, or empty.
+        if (value === undefined || value === null || value === "") {
+         continue;
         }
+
+        // Accept only numbers or numeric strings.
+        if (
+            typeof value !== "number" &&
+            typeof value !== "string"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: `${field} must be a valid number`
+            });
+        }
+
+        if (typeof value === "string" && !value.trim()) {
+            return res.status(400).json({
+                success: false,
+             message: `${field} must be a valid number`
+            });
+        }
+
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return res.status(400).json({
+                success: false,
+                message: `${field} must be a valid number`
+            });
+        }
+
+        // Graduation year must be a positive integer.
+        if (
+            field === "graduationYear" &&
+            (!Number.isInteger(number) || number <= 0)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Graduation year must be a positive integer"
+            });
+        }
+
+        // Percentages must be between 0 and 100.
+        if (
+            field !== "graduationYear" &&
+            (number < 0 || number > 100)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: `${field} must be between 0 and 100`
+            });
+        }
+    }
 
         const user = await prisma.user.findUnique({
             where: {
@@ -318,14 +371,16 @@ const createStudent = async (req, res) => {
             });
         }
 
+        
         const existingStudent = await prisma.student.findFirst({
             where: {
                 OR: [
-                    { userId: Number(userId) },
-                    { prn }
+                    { userId: parsedUserId },
+                    { prn: normalizedPrn }
                 ]
             }
         });
+
 
         if (existingStudent) {
             return res.status(409).json({
@@ -335,30 +390,44 @@ const createStudent = async (req, res) => {
         }
 
         const student = await prisma.student.create({
-        data: {
-        userId: parsedUserId,
-        prn,
-        branch,
-        year: parsedYear,
-        graduationYear:
-            graduationYear === undefined || graduationYear === null || graduationYear === ""
-                ? null
-                : Number(graduationYear),
-        tenthPercentage:
-            tenthPercentage === undefined || tenthPercentage === null || tenthPercentage === ""
-                ? null
-                : Number(tenthPercentage),
-        twelfthPercentage:
-            twelfthPercentage === undefined || twelfthPercentage === null || twelfthPercentage === ""
-                ? null
-                : Number(twelfthPercentage),
-        cgpa: parsedCgpa,
-        activeBacklogs: parsedBacklogs,
-        phone,
-        linkedin,
-        github,
-        portfolio
+        
+            data: {
+                userId: parsedUserId,
+                prn: normalizedPrn,
+                branch: normalizedBranch,
+                year: parsedYear,
+
+                graduationYear:
+                    graduationYear === undefined ||
+                    graduationYear === null ||
+                    graduationYear === ""
+                        ? null
+                        : Number(graduationYear),
+
+                tenthPercentage:
+                    tenthPercentage === undefined ||
+                    tenthPercentage === null ||
+                    tenthPercentage === ""
+                        ? null
+                        : Number(tenthPercentage),
+
+                twelfthPercentage:
+                    twelfthPercentage === undefined ||
+                    twelfthPercentage === null ||
+                    twelfthPercentage === ""
+                        ? null
+                        : Number(twelfthPercentage),
+
+                cgpa: parsedCgpa,
+                activeBacklogs: parsedBacklogs,
+                phone: normalizedPhone,
+
+                // Optional profile links, already validated and trimmed.
+                linkedin: optionalLinks.linkedin,
+                github: optionalLinks.github,
+                portfolio: optionalLinks.portfolio
             },
+
             select: {
                 id: true,
                 userId: true,
@@ -523,6 +592,28 @@ const updateStudent = async (req, res) => {
                 message: "You are not authorized to update this student profile"
             });
         }
+
+        // Students can update only permitted profile fields.
+    if (req.user.role === "STUDENT") {
+        const allowedStudentFields = [
+            "phone",
+            "linkedin",
+            "github",
+            "portfolio"
+        ];
+
+        const attemptedFields = Object.keys(req.body);
+        const forbiddenFields = attemptedFields.filter(
+            (field) => !allowedStudentFields.includes(field)
+        );
+
+        if (forbiddenFields.length > 0) {
+            return res.status(403).json({
+                success: false,
+                message: `Students cannot update these fields: ${forbiddenFields.join(", ")}`
+            });
+        }
+    }
 
         const {
             prn,
@@ -719,7 +810,7 @@ const updateStudent = async (req, res) => {
     }
 };
 
-//Deletes a student profile by student ID.
+// Deletes a student profile and its associated records.
 const deleteStudent = async (req, res) => {
     try {
         const studentId = Number(req.params.id);
@@ -732,10 +823,14 @@ const deleteStudent = async (req, res) => {
             });
         }
 
-        // Check whether the student exists
+        // Fetch the student and associated resume and placement statuses
         const existingStudent = await prisma.student.findUnique({
             where: {
                 id: studentId
+            },
+            include: {
+                resume: true,
+                placementStatuses: true
             }
         });
 
@@ -752,28 +847,115 @@ const deleteStudent = async (req, res) => {
             existingStudent.userId !== req.user.id
         ) {
             return res.status(403).json({
-            success: false,
-            message: "You are not authorized to delete this student profile"
+                success: false,
+                message: "You are not authorized to delete this student profile"
             });
         }
 
-        // Delete the student profile
-        await prisma.student.delete({
-            where: {
-                id: studentId
+        // Delete associated database records transactionally
+        await prisma.$transaction(async (tx) => {
+            const placementIds = existingStudent.placementStatuses.map(
+                (placement) => placement.id
+            );
+
+            // Delete placement history before deleting placement statuses
+            if (placementIds.length > 0) {
+                await tx.placementStatusHistory.deleteMany({
+                    where: {
+                        placementId: {
+                            in: placementIds
+                        }
+                    }
+                });
+
+                await tx.placementStatus.deleteMany({
+                    where: {
+                        studentId
+                    }
+                });
             }
+
+            // Delete student skills
+            await tx.studentSkill.deleteMany({
+                where: {
+                    studentId
+                }
+            });
+
+            // Delete the resume database record
+            await tx.resume.deleteMany({
+                where: {
+                    studentId
+                }
+            });
+
+            // Delete the student record
+            await tx.student.delete({
+                where: {
+                    id: studentId
+                }
+            });
         });
+
+        // Remove the physical resume file after the database transaction succeeds
+        if (existingStudent.resume?.resumeUrl) {
+            const storedResumeUrl = existingStudent.resume.resumeUrl;
+
+            // Accept only paths stored under /uploads/
+            if (
+                typeof storedResumeUrl === "string" &&
+                storedResumeUrl.startsWith("/uploads/")
+            ) {
+                const uploadsPath = path.resolve(__dirname, "../../uploads");
+                const resumePath = path.resolve(
+                    uploadsPath,
+                    storedResumeUrl.slice("/uploads/".length)
+                );
+
+                // Ensure the resolved path remains inside the uploads directory
+                if (resumePath.startsWith(uploadsPath + path.sep)) {
+                    try {
+                        if (fs.existsSync(resumePath)) {
+                            await fs.promises.unlink(resumePath);
+                        }
+                    } catch (fileError) {
+                        // The database deletion succeeded; log file cleanup errors
+                        // rather than reporting the whole deletion as failed.
+                        console.error(
+                            "Error deleting physical resume file:",
+                            fileError
+                        );
+                    }
+                }
+            }
+        }
 
         return res.status(200).json({
             success: true,
-            message: "Student deleted successfully"
+            message: "Student and associated records deleted successfully"
         });
+
     } catch (error) {
         console.error("Error deleting student:", error);
-        
+
+        // Handle foreign-key constraint errors meaningfully
+        if (error.code === "P2003") {
+            return res.status(409).json({
+                success: false,
+                message: "Cannot delete this student because related records still reference it"
+            });
+        }
+
+        if (error.code === "P2025") {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
         return res.status(500).json({
             success: false,
-            message: "Server error"
+            message: "Internal server error while deleting student"
         });
     }
 };
