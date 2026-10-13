@@ -21,6 +21,7 @@ const router = express.Router();
  * The authentication middleware runs before this function,
  * so req.user contains the logged-in user's JWT information.
  */
+
 const authorizeNotificationCreation = (req, res, next) => {
   // Check whether the logged-in user is ADMIN or TPO.
   if (req.user.role !== 'ADMIN' && req.user.role !== 'TPO') {
