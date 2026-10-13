@@ -7,14 +7,15 @@ const {
   updateCompany,
   deleteCompany,
 } = require("../controllers/companyController");
-const { route } = require("./authRoutes");
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-router.post("/", createCompany);
-router.get("/", getCompanies);
-router.get("/:id", getCompanyById);
-router.patch("/:id", updateCompany);
-router.delete("/:id", deleteCompany);
+router.post("/", authMiddleware, roleMiddleware("ADMIN", "TPO"), createCompany);
+router.get("/", authMiddleware, getCompanies);
+router.get("/:id", authMiddleware, getCompanyById);
+router.patch("/:id", authMiddleware, roleMiddleware("ADMIN", "TPO"), updateCompany);
+router.delete("/:id", authMiddleware, roleMiddleware("ADMIN", "TPO"), deleteCompany);
 
 module.exports = router;

@@ -24,36 +24,42 @@ const features = [
     description:
       "Create profiles, add skills, upload resumes and track placement progress.",
     type: "student",
+    href: "#roles",
   },
   {
     title: "Company Management",
     description:
       "Manage companies, job roles, CTC, locations and hiring processes.",
     type: "company",
+    href: "#roles",
   },
   {
     title: "Placement Drives",
     description:
       "Create drives, set schedules, venues, deadlines and job types.",
     type: "drive",
+    href: "#roles",
   },
   {
     title: "Smart Eligibility",
     description:
       "Automatic eligibility based on CGPA, backlogs, branch and graduation year.",
     type: "eligibility",
+    href: "#roles",
   },
   {
     title: "Analytics & Reports",
     description:
       "Get insights, branch-wise reports and analytics with useful reports.",
     type: "analytics",
+    href: "#roles",
   },
   {
     title: "Notifications",
     description:
       "Get real-time updates on drives, shortlists and important announcements.",
     type: "notification",
+    href: "#roles",
   },
 ];
 
@@ -105,6 +111,7 @@ const roles = [
     description:
       "Build your profile, find opportunities and track your placement journey.",
     type: "student",
+    loginPath: "/login?role=student",
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=85",
     points: [
@@ -119,6 +126,7 @@ const roles = [
     description:
       "Manage placements efficiently and connect the right talent with companies.",
     type: "tpo",
+    loginPath: "/login?role=tpo",
     image:
       "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=700&q=85",
     points: [
@@ -133,6 +141,7 @@ const roles = [
     description:
       "Oversee the entire placement ecosystem and maintain platform integrity.",
     type: "admin",
+    loginPath: "/login?role=admin",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=700&q=85",
     points: [
@@ -624,7 +633,7 @@ function FeatureCard({ feature }) {
       </p>
 
       <a
-        href="#features"
+        href={feature.href}
         className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#0b2854] transition-colors hover:text-[#a17b00]"
       >
         Explore
@@ -843,13 +852,13 @@ function RoleCard({ role }) {
             ))}
           </ul>
 
-          <a
-            href="#roles"
-            aria-label={`View ${role.title} role`}
+          <Link
+            to={role.loginPath}
+            aria-label={`Login as ${role.title}`}
             className={`mt-auto flex h-9 w-9 shrink-0 items-center justify-center self-end rounded-full transition-transform duration-200 hover:translate-x-1 ${theme.button}`}
           >
             <ArrowIcon />
-          </a>
+          </Link>
 
         </div>
       </div>
@@ -1062,7 +1071,7 @@ function Footer() {
     >
       <div className="mx-auto max-w-[1240px] px-5 py-12 sm:px-8 lg:px-10">
 
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
 
           {/* BRAND */}
           <div>
@@ -1122,34 +1131,6 @@ function Footer() {
                     className="text-xs text-slate-400 transition-colors hover:text-[#ffc52c]"
                   >
                     {feature.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-          </div>
-
-          {/* SUPPORT */}
-          <div>
-
-            <h3 className="text-sm font-bold">
-              Support
-            </h3>
-
-            <ul className="mt-4 space-y-2">
-              {[
-                "Help Center",
-                "Documentation",
-                "Privacy Policy",
-                "Terms & Conditions",
-                "Contact Support",
-              ].map((item) => (
-                <li key={item}>
-                  <a
-                    href="#contact"
-                    className="text-xs text-slate-400 transition-colors hover:text-[#ffc52c]"
-                  >
-                    {item}
                   </a>
                 </li>
               ))}

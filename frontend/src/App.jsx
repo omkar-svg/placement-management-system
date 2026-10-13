@@ -5,9 +5,17 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import StudentDashboard from './pages/StudentDashboard.jsx';
+import TpoDashboard from "./components/tpo/TpoDashboard";
 
 import AutoAdminAccess from './components/auth/AutoAdminAccess.jsx';
 import Logout from './components/auth/Logout.jsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+import Company from "./components/tpo/Company";
+import TpoLayout from "./components/tpo/TpoLayout";
+import Student from "./components/tpo/Student";
+import PlacementDrive from "./components/tpo/PlacementDrive";
+import Applications from "./components/tpo/Applications";
+import Notifications from "./components/tpo/Notifications";
 
 // --- Admin pages ---
 // Lazy-loaded: these pull in recharts and the rest of the admin bundle,
@@ -19,6 +27,7 @@ const TpoAccountsPage = lazy(() => import('./pages/TpoAccountsPage.jsx'));
 const SystemSettingsPage = lazy(() => import('./pages/SystemSettingsPage.jsx'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx'));
 const AuditLogsPage = lazy(() => import('./pages/AuditLogsPage.jsx'));
+import Placements from "./components/tpo/Placements";
 
 // ============================================================
 // APP ROUTES
@@ -49,6 +58,24 @@ const adminOnly = (page) => (
 function App() {
   return (
     <Routes>
+      {/* tpo routes */}
+      <Route path="/tpo" element={<TpoLayout />}>
+        <Route
+          index
+          element={<Navigate to="dashboard" replace />}
+        />
+
+        <Route path="dashboard" element={<TpoDashboard />} />
+        <Route path="companies" element={<Company />} />
+        <Route path="students" element={<Student />} />
+        <Route path="drives" element={<PlacementDrive />} />
+        <Route path="applications" element={<Applications />} />
+        <Route path="placements" element={<Placements />} />
+        <Route path="notifications" element={<Notifications />} />
+        
+
+        {/* Add your other pages here */}
+      </Route>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<Navigate to="/login" replace />} />

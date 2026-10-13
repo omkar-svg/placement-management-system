@@ -43,9 +43,31 @@ placement-management-system/
 │       ├── context/              # React context (Auth, etc.)
 │       └── App.jsx               # Root component
 │
+├── docs/                         # Project guidelines & documentation
+│   ├── UI_DESIGN_SYSTEM.md       # Complete UI visual guide & exact Tailwind classes
+│   ├── FRONTEND_GUIDELINES.md    # Component patterns, 3 async states & Tailwind rules
+│   ├── DEVELOPMENT_WORKFLOW.md   # Contributor handbook: 4 steps to build & submit PRs
+│   ├── ISSUES_BACKLOG.md         # 11 active GitHub issues ready to claim
+│   ├── BACKEND_API_CONTRACT.md   # Live backend endpoints & response shapes
+│   └── ROADMAP.md                # Milestones & feature matrix
+│
 ├── .gitignore
 └── README.md
 ```
+
+## 📚 Club Guidelines & Documentation
+
+For all Software Developers Club (SDC) contributors:
+* 🎨 **[Unified UI Design System](docs/UI_DESIGN_SYSTEM.md):** **Must Read for UI!** Exact Tailwind classes for Buttons, Cards, Colors, Badges, and Tables.
+* 📐 **[Frontend Engineering Guidelines](docs/FRONTEND_GUIDELINES.md):** Clean component skeletons, the 3 mandatory states (Loading/Error/Empty), and API service patterns.
+* 🚀 **[Contributor Handbook](docs/DEVELOPMENT_WORKFLOW.md):** The 4 simple steps to pick a task and send a PR (Frontend, Backend & DB).
+* 📋 **[Frontend Issues Backlog](docs/ISSUES_BACKLOG.md):** 11 active GitHub issues ready to claim with 1 click.
+* 🔌 **[Backend API Contract](docs/BACKEND_API_CONTRACT.md):** Real backend endpoints you can connect to today.
+* 🗺️ **[Product Roadmap](docs/ROADMAP.md):** Milestone breakdown across Student, TPO, and Admin tracks.
+
+
+
+
 
 ## 🚀 Getting Started
 
