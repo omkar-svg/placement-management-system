@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FiUsers,
   FiSearch,
@@ -11,123 +11,136 @@ import {
   FiAward,
   FiX,
   FiFilter,
+  FiCalendar,
+  FiAlertCircle,
 } from "react-icons/fi";
+import api from "../../services/api";
 
-// Temporary frontend data.
-// Replace with the real API response when an endpoint becomes available.
-const initialStudents = [
-  {
-    id: 1,
-    prn: "2024CSE001",
-    name: "Rahul Patil",
-    email: "rahul.patil@example.com",
-    phone: "9876543210",
-    branch: "CSE",
-    year: 3,
-    cgpa: 8.7,
-    backlogs: 0,
-    graduationYear: 2027,
-    status: "Eligible",
-  },
-  {
-    id: 2,
-    prn: "2024CSE002",
-    name: "Priya Sharma",
-    email: "priya.sharma@example.com",
-    phone: "9876543211",
-    branch: "CSE",
-    year: 3,
-    cgpa: 9.1,
-    backlogs: 0,
-    graduationYear: 2027,
-    status: "Eligible",
-  },
-  {
-    id: 3,
-    prn: "2024IT003",
-    name: "Amit Desai",
-    email: "amit.desai@example.com",
-    phone: "9876543212",
-    branch: "IT",
-    year: 3,
-    cgpa: 7.8,
-    backlogs: 1,
-    graduationYear: 2027,
-    status: "Review Required",
-  },
-  {
-    id: 4,
-    prn: "2024ENTC004",
-    name: "Sneha Kulkarni",
-    email: "sneha.kulkarni@example.com",
-    phone: "9876543213",
-    branch: "ENTC",
-    year: 3,
-    cgpa: 8.4,
-    backlogs: 0,
-    graduationYear: 2027,
-    status: "Eligible",
-  },
-  {
-    id: 5,
-    prn: "2024CSE005",
-    name: "Rohan Jadhav",
-    email: "rohan.jadhav@example.com",
-    phone: "9876543214",
-    branch: "CSE",
-    year: 3,
-    cgpa: 6.9,
-    backlogs: 2,
-    graduationYear: 2027,
-    status: "Review Required",
-  },
-  {
-    id: 6,
-    prn: "2023ME006",
-    name: "Neha Patil",
-    email: "neha.patil@example.com",
-    phone: "9876543215",
-    branch: "Mechanical",
-    year: 4,
-    cgpa: 8.2,
-    backlogs: 0,
-    graduationYear: 2026,
-    status: "Eligible",
-  },
-];
+function extractStudents(response) {
+  const payload = response?.data;
 
-const branches = ["All Branches", "CSE", "IT", "ENTC", "Mechanical"];
+  const result =
+    payload?.data?.students ??
+    payload?.data?.items ??
+    payload?.students ??
+    payload?.items ??
+    payload?.data ??
+    payload;
+
+  return Array.isArray(result) ? result : [];
+}
+
+// Convert the backend Student + related User into one consistent shape.
+function normalizeStudent(student, index) {
+  const user = student.user ?? student.User ?? {};
+
+  const cgpa = Number(student.cgpa ?? 0);
+  const backlogs = Number(
+    student.activeBacklogs ?? student.backlogs ?? 0
+  );
+
+  return {
+    id: student.id ?? student._id ?? index,
+    prn: student.prn ?? "—",
+    name:
+      student.name ??
+      user.name ??
+      student.studentName ??
+      "Unknown Student",
+    email: student.email ?? user.email ?? "—",
+    phone: student.phone ?? "—",
+    branch: student.branch ?? "Not specified",
+    year: student.year ?? "—",
+    cgpa: Number.isFinite(cgpa) ? cgpa : 0,
+    backlogs: Number.isFinite(backlogs) ? backlogs : 0,
+    graduationYear: student.graduationYear ?? "—",
+    tenthPercentage: student.tenthPercentage ?? null,
+    twelfthPercentage: student.twelfthPercentage ?? null,
+    linkedin: student.linkedin ?? null,
+    github: student.github ?? null,
+    portfolio: student.portfolio ?? null,
+    skills: student.skills ?? [],
+    profileCompleted: student.profileCompleted === true,
+    raw: student,
+  };
+}
 
 function Student() {
-  const [students, setStudents] = useState(initialStudents);
+  const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
-  const [branch, setBranch] = useState("All Branches");
-  const [eligibility, setEligibility] = useState("All Statuses");
+  const [branch, setBranch] = useState("ALL");
+  const [profileStatus, setProfileStatus] = useState("ALL");
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchStudents = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      // The shared api service handles the backend base URL and auth token.
+      const response = await api.get("/students");
+      const result = extractStudents(response);
+
+      setStudents(result.map(normalizeStudent));
+    } catch (err) {
+      console.error("Failed to fetch students:", err);
+      setStudents([]);
+
+      setError(
+        err?.response?.status === 404
+          ? "The students API endpoint was not found."
+          : err?.response?.data?.message ??
+              "Unable to load students. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  // Generate branch options from actual API records.
+  const branches = useMemo(
+    () => [
+      ...new Set(
+        students
+          .map((student) => student.branch)
+          .filter((value) => value && value !== "Not specified")
+      ),
+    ].sort(),
+    [students]
+  );
 
   const filteredStudents = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return students.filter((student) => {
-      const matchesSearch =
-        student.name.toLowerCase().includes(query) ||
-        student.prn.toLowerCase().includes(query) ||
-        student.email.toLowerCase().includes(query) ||
-        student.branch.toLowerCase().includes(query);
+      const matchesSearch = [
+        student.name,
+        student.prn,
+        student.email,
+        student.branch,
+        student.phone,
+      ].some((value) => String(value ?? "").toLowerCase().includes(query));
 
       const matchesBranch =
-        branch === "All Branches" || student.branch === branch;
+        branch === "ALL" || student.branch === branch;
 
-      const matchesEligibility =
-        eligibility === "All Statuses" ||
-        student.status === eligibility;
+      const matchesProfile =
+        profileStatus === "ALL" ||
+        (profileStatus === "COMPLETE" && student.profileCompleted) ||
+        (profileStatus === "INCOMPLETE" && !student.profileCompleted);
 
-      return matchesSearch && matchesBranch && matchesEligibility;
+      return matchesSearch && matchesBranch && matchesProfile;
     });
-  }, [students, search, branch, eligibility]);
+  }, [students, search, branch, profileStatus]);
 
-  const eligibleCount = students.filter(
-    (student) => student.status === "Eligible"
+  const completedCount = students.filter(
+    (student) => student.profileCompleted
   ).length;
 
   const averageCgpa = students.length
@@ -137,26 +150,10 @@ function Student() {
       ).toFixed(2)
     : "0.00";
 
-  const handleStatusChange = (id, newStatus) => {
-    setStudents((current) =>
-      current.map((student) =>
-        student.id === id
-          ? { ...student, status: newStatus }
-          : student
-      )
-    );
-
-    setSelectedStudent((current) =>
-      current?.id === id
-        ? { ...current, status: newStatus }
-        : current
-    );
-  };
-
   const resetFilters = () => {
     setSearch("");
-    setBranch("All Branches");
-    setEligibility("All Statuses");
+    setBranch("ALL");
+    setProfileStatus("ALL");
   };
 
   return (
@@ -173,43 +170,74 @@ function Student() {
           </h1>
 
           <p className="mt-2 text-sm text-slate-500">
-            View student profiles, academic performance and eligibility.
+            View registered students, academic performance, and profiles.
           </p>
         </div>
 
-        <span className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-          <FiUsers size={18} />
-          Demo Data
-        </span>
+        <button
+          type="button"
+          onClick={fetchStudents}
+          disabled={loading}
+          className="inline-flex items-center gap-2 rounded-xl bg-[#0b1f3a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#16365e] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <FiRefreshCw className={loading ? "animate-spin" : ""} />
+          {loading ? "Loading..." : "Refresh Students"}
+        </button>
       </header>
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <FiAlertCircle className="mt-0.5 text-red-600" size={20} />
+            <div>
+              <p className="font-semibold text-red-800">
+                Unable to load students
+              </p>
+              <p className="mt-1 text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={fetchStudents}
+            className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
 
       {/* Summary cards */}
       <section className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           icon={FiUsers}
           label="Total Students"
-          value={students.length}
+          value={loading ? "—" : students.length}
           color="bg-blue-50 text-blue-700"
         />
 
         <SummaryCard
           icon={FiAward}
-          label="Eligible Students"
-          value={eligibleCount}
+          label="Completed Profiles"
+          value={loading ? "—" : completedCount}
           color="bg-emerald-50 text-emerald-700"
         />
 
         <SummaryCard
           icon={FiBookOpen}
           label="Branches"
-          value={new Set(students.map((student) => student.branch)).size}
+          value={loading ? "—" : new Set(
+            students
+              .map((student) => student.branch)
+              .filter((value) => value !== "Not specified")
+          ).size}
           color="bg-purple-50 text-purple-700"
         />
 
         <SummaryCard
           icon={FiAward}
           label="Average CGPA"
-          value={averageCgpa}
+          value={loading ? "—" : averageCgpa}
           color="bg-amber-50 text-amber-700"
         />
       </section>
@@ -233,7 +261,7 @@ function Student() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search name, PRN or email..."
+              placeholder="Search name, PRN, email..."
               className="w-full rounded-lg border border-slate-200 py-3 pl-10 pr-3 text-sm outline-none focus:border-[#0b1f3a] focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -243,6 +271,7 @@ function Student() {
             onChange={(event) => setBranch(event.target.value)}
             className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-[#0b1f3a]"
           >
+            <option value="ALL">All Branches</option>
             {branches.map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -251,13 +280,13 @@ function Student() {
           </select>
 
           <select
-            value={eligibility}
-            onChange={(event) => setEligibility(event.target.value)}
+            value={profileStatus}
+            onChange={(event) => setProfileStatus(event.target.value)}
             className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-[#0b1f3a]"
           >
-            <option value="All Statuses">All Statuses</option>
-            <option value="Eligible">Eligible</option>
-            <option value="Review Required">Review Required</option>
+            <option value="ALL">All Profile Statuses</option>
+            <option value="COMPLETE">Profile Complete</option>
+            <option value="INCOMPLETE">Profile Incomplete</option>
           </select>
         </div>
 
@@ -265,9 +294,9 @@ function Student() {
           <p className="text-sm text-slate-500">
             Showing{" "}
             <span className="font-bold text-[#0b1f3a]">
-              {filteredStudents.length}
+              {loading ? 0 : filteredStudents.length}
             </span>{" "}
-            of {students.length} sample students
+            of {loading ? 0 : students.length} students
           </p>
 
           <button
@@ -301,78 +330,99 @@ function Student() {
                 <th className="px-5 py-4 font-semibold">Branch</th>
                 <th className="px-5 py-4 font-semibold">CGPA</th>
                 <th className="px-5 py-4 font-semibold">Backlogs</th>
-                <th className="px-5 py-4 font-semibold">Status</th>
+                <th className="px-5 py-4 font-semibold">Profile</th>
                 <th className="px-5 py-4 font-semibold">Action</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-slate-100">
-              {filteredStudents.map((student) => (
-                <tr
-                  key={student.id}
-                  className="transition hover:bg-slate-50"
-                >
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0b1f3a] font-bold text-[#ffc52c]">
-                        {student.name
-                          .split(" ")
-                          .map((part) => part[0])
-                          .slice(0, 2)
-                          .join("")}
-                      </div>
-
-                      <div>
-                        <p className="font-semibold text-[#0b1f3a]">
-                          {student.name}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {student.email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="px-5 py-4 font-medium text-slate-600">
-                    {student.prn}
-                  </td>
-
-                  <td className="px-5 py-4">{student.branch}</td>
-
-                  <td className="px-5 py-4 font-bold text-[#0b1f3a]">
-                    {student.cgpa.toFixed(2)}
-                  </td>
-
-                  <td className="px-5 py-4">{student.backlogs}</td>
-
-                  <td className="px-5 py-4">
-                    <StatusBadge status={student.status} />
-                  </td>
-
-                  <td className="px-5 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedStudent(student)}
-                      className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-[#0b1f3a] transition hover:border-[#ffc52c] hover:bg-amber-50"
-                    >
-                      View Details
-                    </button>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-5 py-16 text-center">
+                    <FiRefreshCw className="mx-auto animate-spin text-2xl text-amber-500" />
+                    <p className="mt-3 font-semibold text-[#0b1f3a]">
+                      Loading students...
+                    </p>
                   </td>
                 </tr>
-              ))}
-
-              {filteredStudents.length === 0 && (
+              ) : filteredStudents.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-5 py-16 text-center">
                     <FiUsers className="mx-auto text-3xl text-slate-400" />
                     <p className="mt-3 font-bold text-[#0b1f3a]">
-                      No students found
+                      {students.length === 0
+                        ? "No students available"
+                        : "No students found"}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
-                      Try changing your search or filters.
+                      {students.length === 0
+                        ? "Registered student records will appear here when returned by the API."
+                        : "Try changing your search or filters."}
                     </p>
                   </td>
                 </tr>
+              ) : (
+                filteredStudents.map((student) => (
+                  <tr
+                    key={student.id}
+                    className="transition hover:bg-slate-50"
+                  >
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0b1f3a] font-bold text-[#ffc52c]">
+                          {student.name
+                            .split(" ")
+                            .filter(Boolean)
+                            .map((part) => part[0])
+                            .slice(0, 2)
+                            .join("")
+                            .toUpperCase()}
+                        </div>
+
+                        <div>
+                          <p className="font-semibold text-[#0b1f3a]">
+                            {student.name}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {student.email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-4 font-medium text-slate-600">
+                      {student.prn}
+                    </td>
+
+                    <td className="px-5 py-4">{student.branch}</td>
+
+                    <td className="px-5 py-4 font-bold text-[#0b1f3a]">
+                      {student.cgpa.toFixed(2)}
+                    </td>
+
+                    <td className="px-5 py-4">{student.backlogs}</td>
+
+                    <td className="px-5 py-4">
+                      <StatusBadge
+                        status={
+                          student.profileCompleted
+                            ? "Complete"
+                            : "Incomplete"
+                        }
+                      />
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedStudent(student)}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-[#0b1f3a] transition hover:border-[#ffc52c] hover:bg-amber-50"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
@@ -380,7 +430,7 @@ function Student() {
       </section>
 
       <p className="mt-5 text-center text-xs text-slate-400">
-        Demo data only · Changes are temporary and are not saved to a database.
+        Student information is loaded from the backend API.
       </p>
 
       {/* Student details modal */}
@@ -404,9 +454,11 @@ function Student() {
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/10 text-xl font-bold text-[#ffc52c]">
                   {selectedStudent.name
                     .split(" ")
+                    .filter(Boolean)
                     .map((part) => part[0])
                     .slice(0, 2)
-                    .join("")}
+                    .join("")
+                    .toUpperCase()}
                 </div>
 
                 <div>
@@ -452,7 +504,11 @@ function Student() {
                 <DetailItem
                   icon={FiUser}
                   label="Current Year"
-                  value={`Year ${selectedStudent.year}`}
+                  value={
+                    selectedStudent.year === "—"
+                      ? "—"
+                      : `Year ${selectedStudent.year}`
+                  }
                 />
                 <DetailItem
                   icon={FiAward}
@@ -465,38 +521,76 @@ function Student() {
                   value={selectedStudent.backlogs}
                 />
                 <DetailItem
-                  icon={FiCalendarIcon}
+                  icon={FiCalendar}
                   label="Graduation Year"
                   value={selectedStudent.graduationYear}
                 />
+                <DetailItem
+                  icon={FiAward}
+                  label="Profile Status"
+                  value={
+                    selectedStudent.profileCompleted
+                      ? "Complete"
+                      : "Incomplete"
+                  }
+                />
+                <DetailItem
+                  icon={FiBookOpen}
+                  label="10th Percentage"
+                  value={
+                    selectedStudent.tenthPercentage == null
+                      ? "—"
+                      : `${selectedStudent.tenthPercentage}%`
+                  }
+                />
+                <DetailItem
+                  icon={FiBookOpen}
+                  label="12th Percentage"
+                  value={
+                    selectedStudent.twelfthPercentage == null
+                      ? "—"
+                      : `${selectedStudent.twelfthPercentage}%`
+                  }
+                />
               </div>
 
-              <div className="border-t border-slate-100 pt-5">
-                <label
-                  htmlFor="student-status"
-                  className="mb-2 block text-sm font-bold text-[#0b1f3a]"
-                >
-                  Demo Eligibility Status
-                </label>
+              <div className="space-y-3 border-t border-slate-100 pt-5">
+                <h3 className="font-bold text-[#0b1f3a]">
+                  Additional Information
+                </h3>
 
-                <select
-                  id="student-status"
-                  value={selectedStudent.status}
-                  onChange={(event) =>
-                    handleStatusChange(
-                      selectedStudent.id,
-                      event.target.value
-                    )
+                <DetailItem
+                  icon={FiBookOpen}
+                  label="Skills"
+                  value={
+                    Array.isArray(selectedStudent.skills)
+                      ? selectedStudent.skills
+                          .map((skill) =>
+                            typeof skill === "string"
+                              ? skill
+                              : skill.skillName
+                          )
+                          .filter(Boolean)
+                          .join(", ") || "—"
+                      : "—"
                   }
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-[#0b1f3a]"
-                >
-                  <option value="Eligible">Eligible</option>
-                  <option value="Review Required">Review Required</option>
-                </select>
+                />
 
-                <p className="mt-2 text-xs text-slate-500">
-                  This changes only the local demo data.
-                </p>
+                <DetailItem
+                  icon={FiBookOpen}
+                  label="LinkedIn"
+                  value={selectedStudent.linkedin || "—"}
+                />
+                <DetailItem
+                  icon={FiBookOpen}
+                  label="GitHub"
+                  value={selectedStudent.github || "—"}
+                />
+                <DetailItem
+                  icon={FiBookOpen}
+                  label="Portfolio"
+                  value={selectedStudent.portfolio || "—"}
+                />
               </div>
 
               <button
@@ -532,7 +626,7 @@ function SummaryCard({ icon: Icon, label, value, color }) {
 
 function StatusBadge({ status }) {
   const styles =
-    status === "Eligible"
+    status === "Complete"
       ? "bg-emerald-50 text-emerald-700"
       : "bg-amber-50 text-amber-700";
 
@@ -553,15 +647,10 @@ function DetailItem({ icon: Icon, label, value }) {
         <span className="text-xs font-medium">{label}</span>
       </div>
       <p className="break-words text-sm font-semibold text-[#0b1f3a]">
-        {value}
+        {value ?? "—"}
       </p>
     </div>
   );
-}
-
-// Small calendar icon wrapper for the student details.
-function FiCalendarIcon(props) {
-  return <FiBookOpen {...props} />;
 }
 
 export default Student;
