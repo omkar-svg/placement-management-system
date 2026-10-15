@@ -144,9 +144,9 @@ function TpoDashboard() {
     const notifications = dashboard?.recentNotifications ?? [];
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-800 md:flex">
+        <div className="min-h-screen bg-slate-50 text-slate-800 md:flex relative">
             {/* Sidebar */}
-            
+
 
             {/* Main dashboard */}
             <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
@@ -492,7 +492,19 @@ function TpoDashboard() {
                 <footer className="mt-8 border-t border-slate-200 py-5 text-center text-xs text-slate-500">
                     DKTE Placement Management System
                 </footer>
+                <div className="pointer-events-none bottom-0 left-0 z-0 w-full overflow-hidden">
+                    <img
+                        src="/DKTE_IMG.png"
+                        alt=""
+                        aria-hidden="true"
+                        className="block h-auto w-full object-contain opacity-[0.10]"
+                    />
+                </div>
             </main>
+            {/* Faint DKTE Background Image */}
+            {/* Full-width faint DKTE background at bottom */}
+            {/* Full viewport width DKTE background */}
+
         </div>
     );
 }
