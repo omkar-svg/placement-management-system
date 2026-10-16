@@ -65,16 +65,15 @@ model Student {
   userId            Int      @unique
   prn               String   @unique
   branch            String
-  year              Int
-  graduationYear    Int?
+  graduationYear    Int
   tenthPercentage   Float?
   twelfthPercentage Float?
   cgpa              Float
   activeBacklogs    Int      @default(0)
   phone             String
-  linkedin          String?
-  github            String?
-  portfolio         String?
+  linkedin          String? @db.VarChar(255)
+  github            String? @db.VarChar(255)
+  portfolio         String? @db.VarChar(255)
   profileCompleted  Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
